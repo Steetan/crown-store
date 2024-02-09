@@ -1,0 +1,26 @@
+.notFoundEmoji {
+  font-size: 80px;
+}
+
+.notFoundBlock {
+  padding: 100px;
+  text-align: center;
+  @media (max-width: 650px) {
+    padding: 20px;
+  }
+}
+
+.notFoundText {
+  font-size: 40px;
+  @media (max-width: 650px) {
+    font-size: 30px;
+  }
+}
+
+.notFoundSubtitle {
+  margin-top: 20px;
+  font-size: 30px;
+  @media (max-width: 650px) {
+    font-size: 20px;
+  }
+}

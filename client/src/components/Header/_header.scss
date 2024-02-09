@@ -1,0 +1,89 @@
+@import '../../scss/variables';
+
+.header {
+	position: relative;
+	border-bottom: 1px solid $gray-line;
+	padding: 40px 0;
+	margin-bottom: 20px;
+	background-color: #fff;
+	border-radius: 10px;
+	@media (max-width: 960px) {
+		&__logo div p {
+			font-size: 20px;
+		}
+	}
+
+	.container {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		@media (max-width: 960px) {
+			flex-direction: column;
+			gap: 20px;
+		}
+	}
+
+	&__logo {
+		display: flex;
+		@media (max-width: 960px) {
+			align-items: center;
+			gap: 15px;
+			div {
+				text-align: center;
+			}
+			img {
+				width: 70px;
+			}
+		}
+
+		img {
+			margin-right: 15px;
+		}
+
+		h1 {
+			color: #181818;
+			font-size: 24px;
+			letter-spacing: 1%;
+			text-transform: uppercase;
+			font-weight: 800;
+		}
+
+		p {
+			color: #7b7b7b;
+		}
+	}
+}
+
+.btn-avatar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	cursor: pointer;
+	background-color: #fff;
+	border: 2px solid #000;
+	border-radius: 50%;
+	padding: 0 10px;
+	&-img {
+		width: 25px;
+	}
+}
+
+.popup-menu {
+	position: absolute;
+	overflow: hidden;
+	background-color: #fff;
+	z-index: 2;
+	border: 1px solid #7b7b7b;
+	border-radius: 10px;
+	top: 100px;
+	right: 3%;
+	&-item {
+		transition: 0.2s linear;
+		padding: 10px;
+		cursor: pointer;
+		&:hover {
+			background-color: #000;
+			color: #fff;
+		}
+	}
+}
