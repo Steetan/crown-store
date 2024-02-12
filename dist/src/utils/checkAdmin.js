@@ -2,7 +2,6 @@ import jwt from 'jsonwebtoken';
 import { pool } from '../db.js';
 export default (req, res, next) => {
     const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
-    console.log(token);
     jwt.verify(token, 'secret123', (err, decoded) => {
         if (err) {
             res.json({ error: 'Неверный токен' });

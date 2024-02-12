@@ -17,7 +17,6 @@ export interface FormData {
 }
 
 const Registration = ({}) => {
-	const [answReg, setAnswReg] = React.useState({})
 	const dispatch = useAppDispatch()
 	const isAuth = useSelector(selectIsAuth)
 
@@ -30,8 +29,6 @@ const Registration = ({}) => {
 	const onSubmit = async (values: FormData) => {
 		const data = await dispatch(fetchRegister(values))
 
-		setAnswReg(data.payload)
-		console.log(answReg)
 		if (!data.payload) {
 			return alert('Не удалось зарегистрироваться!')
 		}
@@ -108,11 +105,11 @@ const Registration = ({}) => {
 						{errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
 					</div>
 					<div className='form-block__btns'>
-						{!answReg && (
+						{/* {!answReg && (
 							<p style={{ textAlign: 'center', color: 'red' }}>
 								Такой пользователь уже существует!
 							</p>
-						)}
+						)} */}
 						<button type='submit' className='button button--footer'>
 							Зарегистрироваться
 						</button>

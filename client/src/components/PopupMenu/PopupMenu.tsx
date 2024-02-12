@@ -4,7 +4,7 @@ import { fetchDeleteMe, logout } from '../../redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
 
 interface IPopupMenu {
-	isAuth: boolean
+	isAuth: any
 }
 
 const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
@@ -65,6 +65,10 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 			)}
 			{isVisibleMenu && (
 				<div className='popup-menu'>
+					<p className='popup-menu-info-user'>
+						Вы вошли как <br />
+						<b>{isAuth?.decoded?.email || isAuth?.email}</b>
+					</p>
 					<ul className='popup-menu-list'>
 						<li className='popup-menu-item' onClick={onClickItemDelete}>
 							Удалить аккаунт

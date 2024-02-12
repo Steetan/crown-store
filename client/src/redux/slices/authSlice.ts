@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { createSlice, createAsyncThunk, isAnyOf } from '@reduxjs/toolkit'
 import axios from 'axios'
 import { RootState } from '../store'
 import customAxios from '../../axios'
@@ -8,14 +8,6 @@ export const fetchUserData = createAsyncThunk(
 	'auth/fetchUserData',
 	async (params: { email: string; password: string }) => {
 		const { data } = await axios.post(`http://localhost:8080/auth/login`, params)
-		return data
-	},
-)
-
-export const fetchAdmin = createAsyncThunk(
-	'auth/fetchAdmin',
-	async (params: { email: string; password: string }) => {
-		const { data } = await axios.post(`http://localhost:8080/auth/admin`, params)
 		return data
 	},
 )
@@ -68,70 +60,49 @@ const authSlice = createSlice({
 		},
 	},
 	extraReducers: (builder) => {
-		builder.addCase(fetchUserData.pending, (state) => {
-			state.status = Status.LOADING
-			state.data = null
-		})
-		builder.addCase(fetchUserData.fulfilled, (state, action) => {
-			state.data = action.payload
-			state.status = Status.SUCCESS
-		})
-		builder.addCase(fetchUserData.rejected, (state) => {
-			state.status = Status.ERROR
-			state.data = null
-		})
-		builder.addCase(fetchUserMe.pending, (state) => {
-			state.status = Status.LOADING
-			state.data = null
-		})
-		builder.addCase(fetchUserMe.fulfilled, (state, action) => {
-			state.data = action.payload
-			state.status = Status.SUCCESS
-		})
-		builder.addCase(fetchUserMe.rejected, (state) => {
-			state.status = Status.ERROR
-			state.data = null
-		})
-		builder.addCase(fetchRegister.pending, (state) => {
-			state.status = Status.LOADING
-			state.data = null
-		})
-		builder.addCase(fetchRegister.fulfilled, (state, action) => {
-			state.data = action.payload
-			state.status = Status.SUCCESS
-		})
-		builder.addCase(fetchRegister.rejected, (state, action) => {
-			state.status = Status.ERROR
-			state.data = action.payload
-		})
-		builder.addCase(fetchAdmin.pending, (state) => {
-			state.status = Status.LOADING
-			state.data = null
-		})
-		builder.addCase(fetchAdmin.fulfilled, (state, action) => {
-			state.data = action.payload
-			state.status = Status.SUCCESS
-		})
-		builder.addCase(fetchAdmin.rejected, (state) => {
-			state.status = Status.ERROR
-			state.data = null
-		})
-		builder.addCase(fetchAdminMe.pending, (state) => {
-			state.status = Status.LOADING
-			state.data = null
-		})
-		builder.addCase(fetchAdminMe.fulfilled, (state, action) => {
-			state.data = action.payload
-			state.status = Status.SUCCESS
-		})
-		builder.addCase(fetchAdminMe.rejected, (state) => {
-			state.status = Status.ERROR
-			state.data = null
-		})
+		builder
+			.addMatcher(
+				isAnyOf(
+					fetchUserData.pending,
+					fetchUserMe.pending,
+					fetchRegister.pending,
+					fetchAdminMe.pending,
+					fetchDeleteMe.pending,
+				),
+				(state) => {
+					state.status = Status.LOADING
+					state.data = null
+				},
+			)
+			.addMatcher(
+				isAnyOf(
+					fetchUserData.fulfilled,
+					fetchUserMe.fulfilled,
+					fetchRegister.fulfilled,
+					fetchAdminMe.fulfilled,
+				),
+				(state, action) => {
+					state.data = action.payload
+					state.status = Status.SUCCESS
+				},
+			)
+			.addMatcher(
+				isAnyOf(
+					fetchUserData.rejected,
+					fetchUserMe.rejected,
+					fetchRegister.rejected,
+					fetchAdminMe.rejected,
+					fetchDeleteMe.rejected,
+				),
+				(state) => {
+					state.status = Status.ERROR
+					state.data = null
+				},
+			)
 	},
 })
 
-export const selectIsAuth = (state: RootState) => Boolean(state.authSlice.data)
+export const selectIsAuth = (state: RootState) => state.authSlice.data
 
 export const selectIsAuthAdmin = (state: RootState) => Boolean(state.authSlice.data)
 

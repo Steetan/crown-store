@@ -6,6 +6,8 @@ import { pool } from '../db.js'
 export default (req: Request, res: Response, next: NextFunction) => {
 	const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
 
+	console.log(token)
+
 	jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
 		if (err) {
 			res.json({ error: 'Неверный токен' })

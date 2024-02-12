@@ -8,9 +8,25 @@ import jwt from 'jsonwebtoken'
 
 export const loginUser = async (req: Request, res: Response) => {
 	try {
-		const passwordByEmail = await pool.query('SELECT id, password FROM users WHERE email = $1', [
-			req.body.email,
-		])
+		let passwordByEmail: QueryResult = {
+			command: 'SELECT',
+			rowCount: 0,
+			oid: 0,
+			fields: [],
+			rows: [],
+		}
+
+		if (req.path == '/auth/login') {
+			passwordByEmail = await pool.query('SELECT id, password FROM users WHERE email = $1', [
+				req.body.email,
+			])
+		}
+		if (req.path == '/auth/admin') {
+			passwordByEmail = await pool.query(
+				'SELECT id, password FROM users WHERE email = $1 AND access = true',
+				[req.body.email],
+			)
+		}
 
 		const isValidPass = await bcrypt.compare(
 			req.body.password,
@@ -18,7 +34,7 @@ export const loginUser = async (req: Request, res: Response) => {
 		)
 
 		if (!isValidPass) {
-			return res.status(404).json({
+			return res.json({
 				message: 'Неверный логин или пароль',
 			})
 		}
@@ -26,6 +42,7 @@ export const loginUser = async (req: Request, res: Response) => {
 		const token = jwt.sign(
 			{
 				id: passwordByEmail.rows[0].id,
+				email: req.body.email,
 			},
 			'secret123',
 			{
@@ -33,9 +50,10 @@ export const loginUser = async (req: Request, res: Response) => {
 			},
 		)
 
-		res.json({
+		res.status(200).json({
 			success: true,
 			token,
+			email: req.body.email,
 		})
 	} catch (error) {
 		if (error) throw error
@@ -46,7 +64,7 @@ export const createUser = async (req: Request, res: Response) => {
 	try {
 		const errors = validationResult(req)
 		if (!errors.isEmpty()) {
-			return res.status(400).json({ success: false, errors: errors.array() })
+			return res.status(403).json({ error: errors.array() })
 		}
 
 		const existingUser = await pool.query('SELECT * FROM users WHERE email = $1', [req.body.email])
@@ -82,6 +100,7 @@ export const createUser = async (req: Request, res: Response) => {
 		const token = jwt.sign(
 			{
 				id,
+				email: req.body.email,
 			},
 			'secret123',
 			{
@@ -92,6 +111,7 @@ export const createUser = async (req: Request, res: Response) => {
 		res.status(200).json({
 			success: true,
 			token,
+			email: req.body.email,
 		})
 	} catch (error) {
 		res.status(500).json({
@@ -103,8 +123,16 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const getMe = async (req: Request, res: Response) => {
 	try {
-		res.status(200).json({
-			success: true,
+		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+
+		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
+			if (err) {
+				res.json({ error: 'Неверный токен' })
+			} else {
+				return res.status(200).json({
+					decoded,
+				})
+			}
 		})
 	} catch (error) {
 		res.status(403).json({
@@ -115,11 +143,22 @@ export const getMe = async (req: Request, res: Response) => {
 
 export const getMeAdmin = async (req: Request, res: Response) => {
 	try {
-		res.status(200).json({
-			success: true,
+		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+
+		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
+			if (err) {
+				res.json({ error: 'Неверный токен' })
+			} else {
+				pool.query('SELECT FROM users WHERE id = $1 AND access = true', [decoded.id], () => {
+					res.status(200).json({
+						success: true,
+						decoded,
+					})
+				})
+			}
 		})
 	} catch (error) {
-		res.status(300).json({
+		res.status(400).json({
 			message: 'Нет доступа',
 		})
 	}
@@ -149,42 +188,5 @@ export const deleteMe = async (req: Request, res: Response) => {
 		res.status(403).json({
 			message: 'Нет доступа',
 		})
-	}
-}
-
-export const loginAdmin = async (req: Request, res: Response) => {
-	try {
-		const passwordByEmail = await pool.query(
-			'SELECT id, password FROM users WHERE email = $1 AND access = true',
-			[req.body.email],
-		)
-
-		const isValidPass = await bcrypt.compare(
-			req.body.password,
-			passwordByEmail.rows.length > 0 ? passwordByEmail.rows[0].password : '',
-		)
-
-		if (!isValidPass) {
-			return res.status(404).json({
-				message: 'Неверный логин или пароль',
-			})
-		}
-
-		const token = jwt.sign(
-			{
-				id: passwordByEmail.rows[0].id,
-			},
-			'secret123',
-			{
-				expiresIn: '30d',
-			},
-		)
-
-		res.json({
-			success: true,
-			token,
-		})
-	} catch (error) {
-		if (error) throw error
 	}
 }

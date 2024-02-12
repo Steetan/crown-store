@@ -42,6 +42,7 @@ const filterSlice = createSlice({
 	initialState,
 	reducers: {
 		setCategoryId(state, action: PayloadAction<number>) {
+			console.log(action.payload)
 			state.categoryId = action.payload
 		},
 		setSort(state, action: PayloadAction<typeSortSlice>) {

@@ -1,10 +1,9 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { setFilters, setIsVisibleFilterPopup } from '../redux/slices/filterSlice'
+import { setFilters, setIsVisibleFilterPopup, setSelectedPage } from '../redux/slices/filterSlice'
 import { fetchProducts } from '../redux/slices/productSlice'
 import { RootState, useAppDispatch } from '../redux/store'
-import axios from 'axios'
 import qs from 'qs'
 
 import {
@@ -46,14 +45,6 @@ const Home = () => {
 	const { items, status } = useSelector((state: RootState) => state.productSlice)
 
 	React.useEffect(() => {
-		const fetchPages = async () => {
-			axios.get(`http://localhost:8080/`).then((arr) => {
-				setAllPages(arr.data.totalPages)
-			})
-		}
-
-		fetchPages()
-
 		if (window.location.search) {
 			const params = qs.parse(window.location.search.substring(1))
 
@@ -73,15 +64,16 @@ const Home = () => {
 	}, [])
 
 	const getProducts = async () => {
-		const categoryParam: string = `${
-			categoryId > 0 && !searchInput ? `category=${categoryId}` : ''
-		}`
+		const categoryParam: string = `${`categoryid=${categoryId}`}`
+		console.log(categoryParam)
 		const sortParam: string = `&sortBy=${sort.sort}`
 		const orderParam: string = `&order=${typeSort.sort}`
 		const inputParam: string = `${searchInput && `&search=${searchInput}`}`
 		const selectedRating = selectedRatingFilter !== null ? String(selectedRatingFilter) : ''
 
-		dispatch(
+		console.log(categoryParam)
+
+		const data = await dispatch(
 			fetchProducts({
 				categoryParam,
 				sortParam,
@@ -93,8 +85,12 @@ const Home = () => {
 				selectedRating,
 			}),
 		)
-
 		window.scrollTo(0, 0)
+
+		console.log(data.payload)
+
+		setAllPages(data.payload.totalPages)
+		// console.log(data.payload.length / 8)
 	}
 
 	React.useEffect(() => {
@@ -127,6 +123,10 @@ const Home = () => {
 		}
 		isMounted.current = true
 	}, [categoryId, sort.sort, typeSort.sort, selectedPage, nameCategory])
+
+	React.useEffect(() => {
+		dispatch(setSelectedPage(1))
+	}, [categoryId])
 
 	const setFilter = () => {
 		dispatch(setIsVisibleFilterPopup(true))

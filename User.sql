@@ -14,5 +14,12 @@ CREATE TABLE admins (
   password VARCHAR(255)
 );
 
+
+CREATE TABLE carts (
+  id VARCHAR(255) PRIMARY KEY,
+  username VARCHAR(255),
+  password VARCHAR(255)
+);
+
 INSERT INTO users (id, name_user, fname_user, oname_user, username, password, phone_number) 
 VALUES ('1', 'Иван', 'Иванов', 'Иванович', 'ivan123', 'qwerty', 1234567890);

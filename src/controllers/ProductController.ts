@@ -7,7 +7,7 @@ import { validationResult } from '../../node_modules/express-validator/src/valid
 export const getProducts = (req: Request, res: Response) => {
 	let sortBy = req.query.sortBy || 'id'
 	let order = req.query.order || 'ASC'
-	let category = parseInt(req.query.category as string) || 0
+	let category = req.query.categoryid !== undefined ? parseInt(req.query.categoryid as string) : 3
 	let search = req.query.search || ''
 	let page = parseInt(req.query.page as string) || 1
 	let limit = parseInt(req.query.limit as string) || 8
@@ -15,6 +15,7 @@ export const getProducts = (req: Request, res: Response) => {
 	let toRange = parseInt(req.query.toRange as string)
 	let selectedRating = req.query.selectedRatingFilter
 	let parseSelectedRating = ''
+	// console.log(category)
 
 	switch (selectedRating) {
 		case '0':
@@ -51,7 +52,8 @@ export const getProducts = (req: Request, res: Response) => {
 
 	queryString += `ORDER BY ${sortBy} ${order}`
 
-	console.log(queryString)
+	// console.log('category', category)
+	// console.log(queryString)
 
 	pool.query(queryString, (error: Error, results: QueryResult) => {
 		if (error) throw error
@@ -60,10 +62,17 @@ export const getProducts = (req: Request, res: Response) => {
 		let endIndex = page * limit
 		let paginatedResults = results.rows.slice(startIndex, endIndex)
 
+		console.log(results.rows.length)
+
 		let totalProducts = results.rows.length
 		let totalPages = Math.ceil(totalProducts / limit)
+		// console.log('totalpages', totalProducts / limit)
+		// console.log('totalproducts', results.rows)
+		// console.log('limit', limit)
 
-		res.status(200).json({
+		console.log(totalPages)
+
+		res.json({
 			products: paginatedResults,
 			totalPages: totalPages,
 		})
@@ -96,7 +105,7 @@ export const createProduct = (req: Request, res: Response) => {
 				req.body.description,
 				req.body.price,
 				req.body.category,
-				req.body.imgurl,
+				`http://localhost:8080${req.body.fileimg}`,
 				req.body.rating,
 				req.body.totalcount,
 			],

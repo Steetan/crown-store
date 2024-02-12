@@ -12,7 +12,6 @@ import customAxios from './axios'
 import { useAppDispatch } from './redux/store'
 import { fetchUserMe } from './redux/slices/authSlice'
 import AdminPanel from './pages/AdminPanel'
-import AdminLogin from './pages/AdminLogin'
 const Cart = React.lazy(() => import('./pages/Cart'))
 // import { fetchUserData } from './redux/slices/authSlice'
 // import { selectIsAuth } from './redux/slices/authSlice'
@@ -37,8 +36,7 @@ function App() {
 		<Routes>
 			<Route path='/' element={<Layout />}>
 				<Route path='' element={<Home />} />
-				<Route path='auth/admin' element={<AdminLogin />} />
-				<Route path='auth/adminpanel' element={<AdminPanel />} />
+				<Route path='adminpanel' element={<AdminPanel />} />
 				<Route path='auth/login' element={<Login />} />
 				<Route path='auth/reg' element={<Registration />} />
 				<Route path='product/:id' element={<FullProduct />} />

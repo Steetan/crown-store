@@ -4,7 +4,7 @@ import { validationResult } from '../../node_modules/express-validator/src/valid
 export const getProducts = (req, res) => {
     let sortBy = req.query.sortBy || 'id';
     let order = req.query.order || 'ASC';
-    let category = req.query.categoryid !== undefined ? parseInt(req.query.categoryid) : 3;
+    let category = parseInt(req.query.category) || 0;
     let search = req.query.search || '';
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 8;
@@ -12,7 +12,6 @@ export const getProducts = (req, res) => {
     let toRange = parseInt(req.query.toRange);
     let selectedRating = req.query.selectedRatingFilter;
     let parseSelectedRating = '';
-    // console.log(category)
     switch (selectedRating) {
         case '0':
             parseSelectedRating = 'rating >= 4';
@@ -38,22 +37,16 @@ export const getProducts = (req, res) => {
         queryString += Boolean(parseSelectedRating) ? `AND ${parseSelectedRating} ` : '';
     }
     queryString += `ORDER BY ${sortBy} ${order}`;
-    // console.log('category', category)
-    // console.log(queryString)
+    console.log(queryString);
     pool.query(queryString, (error, results) => {
         if (error)
             throw error;
         let startIndex = (page - 1) * limit;
         let endIndex = page * limit;
         let paginatedResults = results.rows.slice(startIndex, endIndex);
-        console.log(results.rows.length);
         let totalProducts = results.rows.length;
         let totalPages = Math.ceil(totalProducts / limit);
-        // console.log('totalpages', totalProducts / limit)
-        // console.log('totalproducts', results.rows)
-        // console.log('limit', limit)
-        console.log(totalPages);
-        res.json({
+        res.status(200).json({
             products: paginatedResults,
             totalPages: totalPages,
         });
@@ -78,7 +71,7 @@ export const createProduct = (req, res) => {
             req.body.description,
             req.body.price,
             req.body.category,
-            `http://localhost:8080${req.body.fileimg}`,
+            req.body.imgurl,
             req.body.rating,
             req.body.totalcount,
         ], (error, results) => {
