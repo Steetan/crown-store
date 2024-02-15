@@ -14,14 +14,11 @@ const Login = ({}) => {
 	const {
 		register,
 		handleSubmit,
-		// setError,
 		formState: { errors },
 	} = useForm<FormData>({ mode: 'onChange' })
 
 	const onSubmit = async (values: FormData) => {
 		const data = await dispatch(fetchUserData(values))
-
-		console.log(data)
 
 		if (!data.payload) {
 			return alert('Не удалось авторизоваться!')

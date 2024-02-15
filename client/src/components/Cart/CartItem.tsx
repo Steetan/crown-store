@@ -1,17 +1,74 @@
 import React from 'react'
-import { useDispatch } from 'react-redux'
-import { minusItem, plusItem, removeItem } from '../../redux/slices/cartSlice'
+import customAxios from '../../axios'
+import { getCart, setTotalCount, setTotalPrice } from '../../redux/slices/cartSlice'
+import { useAppDispatch } from '../../redux/store'
 
 interface ICartItem {
 	id: string
 	title: string
 	imgurl: string
-	count: number
-	price: number
+	totalcount: number
 }
 
-export const CartItem: React.FC<ICartItem> = ({ id, title, imgurl, count, price }) => {
-	const dispatch = useDispatch()
+export const CartItem: React.FC<ICartItem> = ({ id, title, imgurl }) => {
+	const dispatch = useAppDispatch()
+	const [fetchPrice, setFetchPrice] = React.useState(0)
+	const [fetchCount, setFetchCount] = React.useState(0)
+
+	const actItem = (act: string) => {
+		let totalPrice = 0
+		switch (act) {
+			case 'plus':
+				customAxios.patch('/cart/update', { act: 'plus', productid: id }).then(({ data }) => {
+					setFetchPrice(data.results.find((obj: any) => obj.product_id === id)?.product_price)
+					setFetchCount(data.results.find((obj: any) => obj.product_id === id)?.totalcount)
+					data.results.forEach((item: any) => {
+						totalPrice += item.product_price * item.totalcount
+					})
+					dispatch(setTotalPrice(totalPrice))
+				})
+				break
+			case 'minus':
+				customAxios.patch('/cart/update', { act: 'minus', productid: id }).then(({ data }) => {
+					setFetchPrice(data.results.find((obj: any) => obj.product_id === id)?.product_price)
+					setFetchCount(data.results.find((obj: any) => obj.product_id === id)?.totalcount)
+					data.results.forEach((item: any) => {
+						totalPrice += item.product_price * item.totalcount
+					})
+					dispatch(setTotalPrice(totalPrice))
+				})
+				break
+		}
+	}
+
+	const getProductsCart = async () => {
+		let totalPrice = 0
+
+		await dispatch(getCart()).then((data) => {
+			setFetchPrice(data.payload.results.find((obj: any) => obj.product_id === id)?.product_price)
+			setFetchCount(data.payload.results.find((obj: any) => obj.product_id === id)?.totalcount)
+			dispatch(setTotalCount(data.payload.results.length))
+			data.payload.results.forEach((item: any) => {
+				totalPrice += item.product_price * item.totalcount
+			})
+			dispatch(setTotalPrice(totalPrice))
+		})
+	}
+
+	React.useEffect(() => {
+		getProductsCart()
+	}, [])
+
+	const deleteProductCart = async () => {
+		if (window.confirm('Вы действительно хотите удалить?')) {
+			await customAxios.delete('/cart/deletebyid', {
+				params: {
+					product: id,
+				},
+			})
+			await getProductsCart()
+		}
+	}
 
 	return (
 		<div className='cart__item'>
@@ -25,8 +82,9 @@ export const CartItem: React.FC<ICartItem> = ({ id, title, imgurl, count, price 
 			</div>
 			<div className='cart__item-count-price'>
 				<div className='cart__item-count'>
-					<div
-						onClick={() => dispatch(minusItem(id))}
+					<button
+						disabled={fetchCount <= 1}
+						onClick={() => actItem('minus')}
 						className='button button--outline button--circle cart__item-count-minus'
 					>
 						<svg
@@ -45,10 +103,10 @@ export const CartItem: React.FC<ICartItem> = ({ id, title, imgurl, count, price 
 								fill='#EB5A1E'
 							/>
 						</svg>
-					</div>
-					<b>{count}</b>
+					</button>
+					<b>{fetchCount}</b>
 					<div
-						onClick={() => dispatch(plusItem(id))}
+						onClick={() => actItem('plus')}
 						className='button button--outline button--circle cart__item-count-plus'
 					>
 						<svg
@@ -70,15 +128,12 @@ export const CartItem: React.FC<ICartItem> = ({ id, title, imgurl, count, price 
 					</div>
 				</div>
 				<div className='cart__item-price'>
-					<b>{price * count} ₽</b>
+					<b>{fetchPrice * fetchCount} ₽</b>
 				</div>
 			</div>
 
 			<div className='cart__item-remove'>
-				<div
-					onClick={() => dispatch(removeItem(id))}
-					className='button button--outline button--circle'
-				>
+				<div onClick={deleteProductCart} className='button button--outline button--circle'>
 					<svg
 						width='10'
 						height='10'

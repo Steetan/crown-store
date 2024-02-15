@@ -105,11 +105,6 @@ const Registration = ({}) => {
 						{errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
 					</div>
 					<div className='form-block__btns'>
-						{/* {!answReg && (
-							<p style={{ textAlign: 'center', color: 'red' }}>
-								Такой пользователь уже существует!
-							</p>
-						)} */}
 						<button type='submit' className='button button--footer'>
 							Зарегистрироваться
 						</button>

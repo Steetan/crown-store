@@ -2,6 +2,7 @@ import React from 'react'
 import { useAppDispatch } from '../../redux/store'
 import { fetchDeleteMe, logout } from '../../redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
+import customAxios from '../../axios'
 
 interface IPopupMenu {
 	isAuth: any
@@ -49,10 +50,11 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 
 	const onClickItemDelete = async () => {
 		if (window.confirm('Вы действительно хотите удалить аккаунт?')) {
+			await customAxios.delete('/cart/deleteallbyid')
 			await dispatch(fetchDeleteMe(window.localStorage.getItem('token'))).finally(() => {
 				resetUser()
-				window.location.reload()
 			})
+			window.location.reload()
 		}
 	}
 

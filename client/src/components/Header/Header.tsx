@@ -6,27 +6,16 @@ import { selectCart } from '../../redux/slices/cartSlice'
 import { setSearchInput } from '../../redux/slices/filterSlice'
 import { selectIsAuth } from '../../redux/slices/authSlice'
 import PopupMenu from '../PopupMenu/PopupMenu'
-import { useAppDispatch } from '../../redux/store'
+import { RootState, useAppDispatch } from '../../redux/store'
 
 export const Header: React.FC = () => {
 	const isAuth = useSelector(selectIsAuth)
-	const { totalPrice, cartItems } = useSelector(selectCart)
+	const { totalPrice } = useSelector(selectCart)
+	const { totalCount } = useSelector((state: RootState) => state.cartSlice)
 	const location = useLocation()
 	const dispatch = useAppDispatch()
-	const isMounted = React.useRef(false)
-
-	const totalCount = cartItems.reduce((sum: number, item: any) => sum + item.count, 0)
 
 	const isLoginPage = location.pathname === '/auth/login' || location.pathname === '/auth/reg'
-
-	React.useEffect(() => {
-		if (isMounted.current) {
-			const json = JSON.stringify(cartItems)
-			localStorage.setItem('cart', json)
-		}
-
-		isMounted.current = true
-	}, [totalCount])
 
 	return (
 		<div className='header'>

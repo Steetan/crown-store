@@ -46,11 +46,11 @@ const AdminPanel: React.FC = () => {
 	const handleFileChange = async (event: any) => {
 		try {
 			const formData = new FormData()
-			const file = event.target.files[0]
-			formData.append('image', file)
-			const { data } = await axios.post('http://localhost:8080/upload', formData)
-			setImgUrl(data.url)
-			console.log(`http://localhost:8080${imgUrl}`)
+			formData.append('image', event.target.files[0])
+
+			axios.post('http://localhost:8080/upload', formData).then(({ data }) => {
+				setImgUrl(data.url)
+			})
 		} catch (error) {
 			console.warn(error)
 		}

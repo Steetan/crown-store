@@ -1,6 +1,13 @@
 import { getCartLS } from '../../utils/getCartLS'
 import { RootState } from './../store'
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import customAxios from '../../axios'
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
+
+export enum Status {
+	LOADING = 'loading',
+	SUCCESS = 'success',
+	ERROR = 'error',
+}
 
 export type typeCartItem = {
 	id: string
@@ -12,63 +19,61 @@ export type typeCartItem = {
 
 type typeInitialState = {
 	totalPrice: number
+	totalCount: number
 	cartItems: typeCartItem[]
+	status: Status
+	countProduct: { product: string; count: number }[]
 }
 
-const { cartItems, totalPrice } = getCartLS()
+const { cartItems } = getCartLS()
 
 const initialState: typeInitialState = {
-	totalPrice,
+	totalPrice: 0,
+	totalCount: 0,
 	cartItems,
+	countProduct: [],
+	status: Status.LOADING,
 }
+
+export const getCart = createAsyncThunk('auth/getCart', async () => {
+	const { data } = await customAxios.get(`http://localhost:8080/cart/get`)
+	return data
+})
 
 const cartSlice = createSlice({
 	name: 'cart',
 	initialState,
 	reducers: {
-		addItem(state, action: PayloadAction<typeCartItem>) {
-			const findItem = state.cartItems.find((obj) => obj.id === action.payload.id)
-
-			if (!findItem) {
-				state.cartItems.push({
-					...action.payload,
-					count: 0,
-				})
-			}
+		setTotalPrice: (state, action: PayloadAction<number>) => {
+			state.totalPrice = action.payload
 		},
-		removeItem(state, action) {
-			const findItem = state.cartItems.find((obj) => obj.id === action.payload)
-			if (findItem) {
-				state.totalPrice -= findItem.price * findItem.count
-			}
-			state.cartItems = state.cartItems.filter((obj) => obj.id !== action.payload)
+		setCartItems: (state, action: PayloadAction<any>) => {
+			state.cartItems = action.payload
 		},
-		plusItem(state, action) {
-			const findItem = state.cartItems.find((obj) => obj.id === action.payload)
-
-			if (findItem) {
-				findItem.count++
-				state.totalPrice += findItem.price
-			}
+		setTotalCount: (state, action: PayloadAction<any>) => {
+			state.totalCount = action.payload
 		},
-		minusItem(state, action) {
-			const findItem = state.cartItems.find((obj) => obj.id === action.payload)
-
-			if (findItem) {
-				findItem.count--
-				state.totalPrice -= findItem.price
-				state.cartItems = state.cartItems.filter((el) => el.count !== 0)
-			}
+		setCountProduct: (state, action: PayloadAction<{ product: string; count: number }[]>) => {
+			state.countProduct = action.payload
 		},
-		clearItems(state) {
-			state.cartItems = []
-			state.totalPrice = 0
-		},
+	},
+	extraReducers: (builder) => {
+		builder.addCase(getCart.pending, (state) => {
+			state.status = Status.LOADING
+		})
+		builder.addCase(getCart.fulfilled, (state, action) => {
+			console.log(action.payload)
+			state.status = Status.SUCCESS
+			state.cartItems = action.payload.results
+		})
+		builder.addCase(getCart.rejected, (state) => {
+			state.status = Status.ERROR
+		})
 	},
 })
 
 export const selectCart = (state: RootState) => state.cartSlice
 
-export const { addItem, removeItem, clearItems, minusItem, plusItem } = cartSlice.actions
+export const { setTotalPrice, setCartItems, setTotalCount, setCountProduct } = cartSlice.actions
 
 export default cartSlice.reducer

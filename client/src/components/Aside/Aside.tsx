@@ -7,6 +7,12 @@ import {
 	setSelectedRatingFilter,
 	setToRangeFilter,
 } from '../../redux/slices/filterSlice'
+import {
+	getCart,
+	setCountProduct,
+	setTotalCount,
+	setTotalPrice,
+} from '../../redux/slices/cartSlice'
 
 const Aside = () => {
 	const [inputBefore, setInputBefore] = React.useState('')
@@ -29,6 +35,7 @@ const Aside = () => {
 		dispatch(setToRangeFilter(Number(inputAfter)))
 		dispatch(setIsVisibleFilterPopup(false))
 		dispatch(setSelectedRatingFilter(selectedRating))
+		getProductsCart()
 		window.scrollTo(0, 0)
 	}
 
@@ -39,6 +46,23 @@ const Aside = () => {
 		dispatch(setToRangeFilter(0))
 		dispatch(setSelectedRatingFilter(null))
 		setSelectedRating(null)
+		getProductsCart()
+	}
+
+	const getProductsCart = () => {
+		let totalPrice = 0
+
+		dispatch(getCart()).then((data) => {
+			let arrCountProduct: { product: string; count: number }[] = []
+			data.payload &&
+				data.payload.results.forEach((item: any) => {
+					totalPrice += item.product_price * item.totalcount
+					arrCountProduct.push({ product: item.product_id, count: item.totalcount })
+				})
+			dispatch(setCountProduct(arrCountProduct))
+			dispatch(setTotalPrice(totalPrice))
+			dispatch(setTotalCount(data.payload?.results.length))
+		})
 	}
 
 	return (

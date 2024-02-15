@@ -23,7 +23,7 @@ function App() {
 	React.useEffect(() => {
 		const fetchPages = async () => {
 			try {
-				await customAxios.get('/')
+				await customAxios.get('')
 				await dispatch(fetchUserMe())
 			} catch (error) {
 				console.error(error)

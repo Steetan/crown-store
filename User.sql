@@ -17,8 +17,9 @@ CREATE TABLE admins (
 
 CREATE TABLE carts (
   id VARCHAR(255) PRIMARY KEY,
-  username VARCHAR(255),
-  password VARCHAR(255)
+  user_id VARCHAR(255),
+  product_id VARCHAR(255),
+  totalcount INTEGER
 );
 
 INSERT INTO users (id, name_user, fname_user, oname_user, username, password, phone_number) 

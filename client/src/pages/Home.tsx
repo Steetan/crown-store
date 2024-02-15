@@ -15,6 +15,7 @@ import {
 	listSort,
 	listTypeSort,
 } from '../components'
+import { getCart, setCountProduct, setTotalCount, setTotalPrice } from '../redux/slices/cartSlice'
 
 interface IProductBlock {
 	id: string
@@ -43,6 +44,7 @@ const Home = () => {
 		selectedRatingFilter,
 	} = useSelector((state: RootState) => state.filterSlice)
 	const { items, status } = useSelector((state: RootState) => state.productSlice)
+	const { countProduct } = useSelector((state: RootState) => state.cartSlice)
 
 	React.useEffect(() => {
 		if (window.location.search) {
@@ -63,15 +65,32 @@ const Home = () => {
 		isSearch.current = false
 	}, [])
 
+	const getProductsCart = () => {
+		let totalPrice = 0
+
+		dispatch(getCart()).then((data) => {
+			let arrCountProduct: { product: string; count: number }[] = []
+			data.payload &&
+				data.payload.results.forEach((item: any) => {
+					totalPrice += item.product_price * item.totalcount
+					arrCountProduct.push({ product: item.product_id, count: item.totalcount })
+				})
+			dispatch(setCountProduct(arrCountProduct))
+			dispatch(setTotalPrice(totalPrice))
+			dispatch(setTotalCount(data.payload?.results.length))
+		})
+	}
+
+	React.useEffect(() => {
+		getProductsCart()
+	}, [])
+
 	const getProducts = async () => {
 		const categoryParam: string = `${`categoryid=${categoryId}`}`
-		console.log(categoryParam)
 		const sortParam: string = `&sortBy=${sort.sort}`
 		const orderParam: string = `&order=${typeSort.sort}`
 		const inputParam: string = `${searchInput && `&search=${searchInput}`}`
 		const selectedRating = selectedRatingFilter !== null ? String(selectedRatingFilter) : ''
-
-		console.log(categoryParam)
 
 		const data = await dispatch(
 			fetchProducts({
@@ -87,10 +106,7 @@ const Home = () => {
 		)
 		window.scrollTo(0, 0)
 
-		console.log(data.payload)
-
 		setAllPages(data.payload.totalPages)
-		// console.log(data.payload.length / 8)
 	}
 
 	React.useEffect(() => {
@@ -138,7 +154,7 @@ const Home = () => {
 			<div className='content__top'>
 				<Categories />
 				<div className='content-settings'>
-					<Sort value={sort} />
+					<Sort value={sort} getProductsCart={getProductsCart} />
 					<div className='filter-button-wrapper'>
 						<img
 							className='filter-button'
@@ -167,7 +183,9 @@ const Home = () => {
 				<div className='content__items'>
 					{status === 'loading'
 						? [...new Array(6)].map((_, index) => <ProductBlockSkeleton key={index} />)
-						: items.map((item: IProductBlock) => <ProductBlock key={item.id} {...item} />)}
+						: items.map((item: IProductBlock) => (
+								<ProductBlock key={item.id} {...item} countProduct={countProduct} />
+						  ))}
 				</div>
 			)}
 			{status === 'success' && !items.length && !searchInput && (

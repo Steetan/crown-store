@@ -2,25 +2,48 @@ import React from 'react'
 import '../scss/app.scss'
 import { Link, Navigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
-import { clearItems, selectCart } from '../redux/slices/cartSlice'
-import { useAppDispatch } from '../redux/store'
+import { getCart, selectCart, setTotalCount, setTotalPrice } from '../redux/slices/cartSlice'
+import { RootState, useAppDispatch } from '../redux/store'
+import customAxios from '../axios'
 
 import { CartItem, CartEmpty } from '../components'
 import { selectIsAuth } from '../redux/slices/authSlice'
 
 const Card: React.FC = () => {
 	const { totalPrice, cartItems } = useSelector(selectCart)
+	const { totalCount } = useSelector((state: RootState) => state.cartSlice)
 	const isAuth = useSelector(selectIsAuth)
 	const dispatch = useAppDispatch()
+
+	const getProductsCart = async () => {
+		let totalPrice = 0
+
+		dispatch(getCart()).then((data) => {
+			dispatch(setTotalCount(data.payload.results.length))
+			data.payload.results.forEach((item: any) => {
+				totalPrice += item.product_price * item.totalcount
+			})
+			dispatch(setTotalPrice(totalPrice))
+		})
+	}
+
+	React.useEffect(() => {
+		getProductsCart()
+	}, [])
 
 	if (!isAuth) {
 		return <Navigate to='/auth/login' />
 	}
 
-	const totalCount = cartItems.reduce((sum: number, item: any) => sum + item.count, 0)
-
 	if (!cartItems.length) {
 		return <CartEmpty />
+	}
+
+	const cleanCart = async () => {
+		if (window.confirm('Вы действительно хотите очистить корзину?')) {
+			await customAxios.delete('/cart/delete')
+			await getProductsCart()
+		}
 	}
 
 	return (
@@ -59,7 +82,7 @@ const Card: React.FC = () => {
 						</svg>
 						Корзина
 					</h2>
-					<button onClick={() => dispatch(clearItems())} className='cart__clear'>
+					<button onClick={cleanCart} className='cart__clear'>
 						<svg
 							width='20'
 							height='20'
@@ -101,11 +124,15 @@ const Card: React.FC = () => {
 					</button>
 				</div>
 				<div className='content__items content__items--cart'>
-					{cartItems.map(
-						(item: { id: string; title: string; imgurl: string; count: number; price: number }) => (
-							<CartItem key={item.id} {...item} />
-						),
-					)}
+					{cartItems.map((item: any) => (
+						<CartItem
+							key={item.id}
+							id={item.product_id}
+							totalcount={item.totalcount}
+							title={item.product_title}
+							imgurl={item.product_img}
+						/>
+					))}
 				</div>
 				<div className='cart__bottom'>
 					<div className='cart__bottom-details'>

@@ -26,8 +26,14 @@ export const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 req.body.email,
             ]);
         }
+        else {
+            res.status(400);
+        }
         if (req.path == '/auth/admin') {
             passwordByEmail = yield pool.query('SELECT id, password FROM users WHERE email = $1 AND access = true', [req.body.email]);
+        }
+        else {
+            res.status(400);
         }
         const isValidPass = yield bcrypt.compare(req.body.password, passwordByEmail.rows.length > 0 ? passwordByEmail.rows[0].password : '');
         if (!isValidPass) {
@@ -120,29 +126,27 @@ export const getMe = (req, res) => __awaiter(void 0, void 0, void 0, function* (
         });
     }
 });
-export const getMeAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
-        jwt.verify(token, 'secret123', (err, decoded) => {
-            if (err) {
-                res.json({ error: 'Неверный токен' });
-            }
-            else {
-                pool.query('SELECT FROM users WHERE id = $1 AND access = true', [decoded.id], () => {
-                    res.status(200).json({
-                        success: true,
-                        decoded,
-                    });
-                });
-            }
-        });
-    }
-    catch (error) {
-        res.status(400).json({
-            message: 'Нет доступа',
-        });
-    }
-});
+// export const getMeAdmin = async (req: Request, res: Response) => {
+// 	try {
+// 		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+// 		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
+// 			if (err) {
+// 				res.json({ error: 'Неверный токен' })
+// 			} else {
+// 				pool.query('SELECT FROM users WHERE id = $1 AND access = true', [decoded.id], () => {
+// 					res.status(200).json({
+// 						success: true,
+// 						decoded,
+// 					})
+// 				})
+// 			}
+// 		})
+// 	} catch (error) {
+// 		res.status(400).json({
+// 			message: 'Нет доступа',
+// 		})
+// 	}
+// }
 export const deleteMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');

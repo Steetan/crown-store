@@ -15,10 +15,11 @@ export const listTypeSort = [
 ]
 
 interface ISort {
+	getProductsCart: any
 	value: { name: string; sort: string }
 }
 
-export const Sort: React.FC<ISort> = React.memo(({ value }) => {
+export const Sort: React.FC<ISort> = React.memo(({ value, getProductsCart }) => {
 	const [isVisible, setIsVisible] = React.useState(false)
 	const { typeSort } = useSelector((state: RootState) => state.filterSlice)
 	const dispatch = useAppDispatch()
@@ -27,11 +28,13 @@ export const Sort: React.FC<ISort> = React.memo(({ value }) => {
 	const selectedSort = (index: { name: string; sort: string }) => {
 		dispatch(setSort(index))
 		setIsVisible(!isVisible)
+		getProductsCart()
 	}
 
 	const selectedTypeSort = (type: { name: string; sort: string }) => {
 		dispatch(setTypeSort(type))
 		setIsVisible(!isVisible)
+		getProductsCart()
 	}
 
 	React.useEffect(() => {

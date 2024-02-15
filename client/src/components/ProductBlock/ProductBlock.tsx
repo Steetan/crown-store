@@ -1,33 +1,66 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { addItem, plusItem, typeCartItem } from '../../redux/slices/cartSlice'
+import { setTotalCount, setTotalPrice } from '../../redux/slices/cartSlice'
 import { Link } from 'react-router-dom'
 import { RootState, useAppDispatch } from '../../redux/store'
+import customAxios from '../../axios'
 
 interface IProductBlock {
 	id: string
 	title: string
 	imgurl: string
 	price: number
+	countProduct?: { product: string; count: number }[]
 }
 
-export const ProductBlock: React.FC<IProductBlock> = ({ id, title, imgurl, price }) => {
-	const cartItem = useSelector((state: RootState) =>
-		state.cartSlice.cartItems.find((obj: IProductBlock) => obj.id === id),
-	)
+export const ProductBlock: React.FC<IProductBlock> = ({
+	id,
+	title,
+	imgurl,
+	price,
+	countProduct,
+}) => {
+	const { totalCount, totalPrice } = useSelector((state: RootState) => state.cartSlice)
 	const dispatch = useAppDispatch()
+	const [targetProduct, setTargetProduct] = React.useState<{ product: string; count: number }>({
+		product: '',
+		count: 0,
+	})
 
-	const countItem = cartItem ? cartItem.count : 0
+	React.useEffect(() => {
+		const target = countProduct?.find((product) => product.product === id)
+		setTargetProduct(target ?? { product: 'id', count: 0 })
+	}, [countProduct])
 
-	const onClickAdd = () => {
-		const item = {
-			id,
-			title,
-			price,
-			imgurl,
-		} as typeCartItem
-		dispatch(addItem(item))
-		dispatch(plusItem(item.id))
+	const onClickAdd = async () => {
+		customAxios
+			.get('/cart/getbyid', {
+				params: {
+					product: id,
+				},
+			})
+			.then(({ data }) => {
+				!data.value && dispatch(setTotalCount(totalCount + 1))
+				dispatch(setTotalPrice(totalPrice + price))
+				if (targetProduct) {
+					const newCount = targetProduct.count + 1
+					setTargetProduct({ ...targetProduct, count: newCount })
+				}
+				if (!data.value) {
+					return customAxios.post('/cart', {
+						product: id,
+						price,
+						act: 'push',
+						title,
+						imgurl,
+					})
+				} else if (data.value) {
+					return customAxios.patch('/cart/update', {
+						productid: id,
+						act: 'plus',
+					})
+				}
+			})
 	}
 
 	return (
@@ -47,7 +80,7 @@ export const ProductBlock: React.FC<IProductBlock> = ({ id, title, imgurl, price
 				<div className='product-block__price'>{price} ₽</div>
 				<button onClick={() => onClickAdd()} className='button button--outline button--add'>
 					<span>Добавить</span>
-					{countItem !== 0 && <i>{countItem}</i>}
+					{targetProduct.count !== 0 && <i>{targetProduct.count}</i>}
 				</button>
 			</div>
 		</div>

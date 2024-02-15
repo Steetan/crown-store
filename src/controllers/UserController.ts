@@ -20,12 +20,16 @@ export const loginUser = async (req: Request, res: Response) => {
 			passwordByEmail = await pool.query('SELECT id, password FROM users WHERE email = $1', [
 				req.body.email,
 			])
+		} else {
+			res.status(400)
 		}
 		if (req.path == '/auth/admin') {
 			passwordByEmail = await pool.query(
 				'SELECT id, password FROM users WHERE email = $1 AND access = true',
 				[req.body.email],
 			)
+		} else {
+			res.status(400)
 		}
 
 		const isValidPass = await bcrypt.compare(
@@ -141,28 +145,28 @@ export const getMe = async (req: Request, res: Response) => {
 	}
 }
 
-export const getMeAdmin = async (req: Request, res: Response) => {
-	try {
-		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+// export const getMeAdmin = async (req: Request, res: Response) => {
+// 	try {
+// 		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
 
-		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
-			if (err) {
-				res.json({ error: 'Неверный токен' })
-			} else {
-				pool.query('SELECT FROM users WHERE id = $1 AND access = true', [decoded.id], () => {
-					res.status(200).json({
-						success: true,
-						decoded,
-					})
-				})
-			}
-		})
-	} catch (error) {
-		res.status(400).json({
-			message: 'Нет доступа',
-		})
-	}
-}
+// 		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
+// 			if (err) {
+// 				res.json({ error: 'Неверный токен' })
+// 			} else {
+// 				pool.query('SELECT FROM users WHERE id = $1 AND access = true', [decoded.id], () => {
+// 					res.status(200).json({
+// 						success: true,
+// 						decoded,
+// 					})
+// 				})
+// 			}
+// 		})
+// 	} catch (error) {
+// 		res.status(400).json({
+// 			message: 'Нет доступа',
+// 		})
+// 	}
+// }
 
 export const deleteMe = async (req: Request, res: Response) => {
 	try {

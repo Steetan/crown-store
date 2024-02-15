@@ -73,6 +73,26 @@
 		span {
 			color: $orange;
 		}
+		&:disabled {
+			border-color: #a9a9a9;
+			&:hover {
+				background-color: #fff;
+				svg {
+					path {
+						fill: #a9a9a9;
+					}
+				}
+			}
+			&,
+			span {
+				color: #a9a9a9;
+			}
+			svg {
+				path {
+					fill: #a9a9a9;
+				}
+			}
+		}
 
 		svg {
 			path {

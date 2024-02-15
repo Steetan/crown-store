@@ -38,8 +38,6 @@ export const fetchProducts = createAsyncThunk(
 	},
 )
 
-console.log(111)
-
 export const createProduct = createAsyncThunk(
 	'product/createProduct',
 	async (params: DataProduct) => {
