@@ -54,6 +54,8 @@ export const loginUser = async (req: Request, res: Response) => {
 			},
 		)
 
+		console.log('token', passwordByEmail.rows)
+
 		res.status(200).json({
 			success: true,
 			token,
@@ -145,6 +147,34 @@ export const getMe = async (req: Request, res: Response) => {
 	}
 }
 
+export const getMeInfo = async (req: Request, res: Response) => {
+	try {
+		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+
+		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
+			if (err) {
+				res.json({ error: 'Неверный токен' })
+			} else {
+				pool.query(
+					'SELECT name_user, fname_user, oname_user FROM users WHERE id = $1',
+					[decoded.id],
+					(error: Error, results: QueryResult) => {
+						if (error) throw error
+						res.json(results.rows[0])
+					},
+				)
+				// return res.status(200).json({
+				// 	decoded,
+				// })
+			}
+		})
+	} catch (error) {
+		res.status(403).json({
+			message: 'Нет доступа',
+		})
+	}
+}
+
 // export const getMeAdmin = async (req: Request, res: Response) => {
 // 	try {
 // 		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
@@ -187,6 +217,31 @@ export const deleteMe = async (req: Request, res: Response) => {
 			res.json({
 				access: true,
 			})
+		})
+	} catch (error) {
+		res.status(403).json({
+			message: 'Нет доступа',
+		})
+	}
+}
+
+export const updateUser = async (req: Request, res: Response) => {
+	try {
+		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
+
+		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
+			if (err) {
+				res.status(401).json({ error: 'Неверный токен' })
+			} else {
+				pool.query(
+					'UPDATE users set name_user = $1, fname_user = $2, oname_user = $3 WHERE id=$4',
+					[req.body.name, req.body.fname, req.body.oname, decoded.id],
+					(error: Error, results: QueryResult) => {
+						if (error) throw error
+						res.status(200).json({ message: 'Данные были обновлены успешно!' })
+					},
+				)
+			}
 		})
 	} catch (error) {
 		res.status(403).json({

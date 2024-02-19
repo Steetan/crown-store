@@ -3,6 +3,7 @@ import { QueryResult } from 'pg'
 import { pool } from '../db.js'
 import { v4 as uuidv4 } from 'uuid'
 import { validationResult } from '../../node_modules/express-validator/src/validation-result.js'
+import fs from 'fs'
 
 export const getProducts = (req: Request, res: Response) => {
 	let sortBy = req.query.sortBy || 'id'
@@ -105,7 +106,7 @@ export const createProduct = (req: Request, res: Response) => {
 				req.body.description,
 				req.body.price,
 				req.body.category,
-				`http://localhost:8080${req.body.fileimg}`,
+				`http://localhost:8080/uploads/${req.body.fileimg}`,
 				req.body.rating,
 				req.body.totalcount,
 			],
@@ -119,4 +120,56 @@ export const createProduct = (req: Request, res: Response) => {
 	} catch (error) {
 		console.log(error)
 	}
+}
+
+export const deleteFileController = (req: Request, res: Response) => {
+	const filePath = `uploads/${req.params.filename}`
+
+	pool.query(
+		`SELECT imgurl FROM product WHERE imgurl ILIKE ${"'%" + filePath + "%'"}`,
+		(error: Error, results: QueryResult) => {
+			if (error) throw error
+			if (!results.rows.length) {
+				fs.stat(filePath, (err, stats) => {
+					if (err) {
+						if (err.code === 'ENOENT') {
+							return res.status(404).json({ message: 'File not found' })
+						} else {
+							console.error(err)
+							return res.status(500).json({ message: 'Internal server error' })
+						}
+					}
+
+					fs.unlink(filePath, (err) => {
+						if (err) {
+							console.error(err)
+							return res.status(500).json({ message: 'Error deleting file' })
+						}
+						console.log('File deleted successfully')
+						return res.json({ message: 'File deleted successfully' })
+					})
+				})
+			} else {
+				return res.status(400).json({ message: 'Не удалось удалить файл' })
+			}
+		},
+	)
+}
+
+export const getAllProducts = (req: Request, res: Response) => {
+	pool.query('SELECT * FROM product', (error: Error, results: QueryResult) => {
+		if (error) throw error
+		res.status(200).json(results.rows)
+	})
+}
+
+export const deleteProductById = (req: Request, res: Response) => {
+	pool.query(
+		'DELETE FROM product WHERE id = $1',
+		[req.query.product],
+		(error: Error, results: QueryResult) => {
+			if (error) throw error
+			res.status(200).json({ message: 'product has been deleted' })
+		},
+	)
 }

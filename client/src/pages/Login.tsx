@@ -65,7 +65,7 @@ const Login = ({}) => {
 							Нет аккаунта?
 							<Link to='/auth/reg' className='button-link-reg'>
 								{' '}
-								Зарегистрируйся
+								Зарегистрироваться
 							</Link>
 						</p>
 					</div>

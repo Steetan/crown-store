@@ -4,7 +4,7 @@ import '../ProductBlock/_product-block.scss'
 
 export const ProductBlockSkeleton = () => (
 	<ContentLoader
-		className='product-block'
+		className='product-block product-block--skeleton'
 		speed={2}
 		width={280}
 		height={425}

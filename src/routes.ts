@@ -1,6 +1,20 @@
 import { Router } from 'express'
-import { createUser, deleteMe, getMe, loginUser } from './controllers/UserController.js'
-import { createProduct, getProductById, getProducts } from './controllers/ProductController.js'
+import {
+	createUser,
+	deleteMe,
+	getMe,
+	getMeInfo,
+	loginUser,
+	updateUser,
+} from './controllers/UserController.js'
+import {
+	createProduct,
+	deleteFileController,
+	deleteProductById,
+	getAllProducts,
+	getProductById,
+	getProducts,
+} from './controllers/ProductController.js'
 import { registerProductValidator, registerValidator } from './validations.js'
 import checkAuth from './utils/checkAuth.js'
 import multer from 'multer'
@@ -30,13 +44,17 @@ const upload = multer({ storage })
 
 router.post('/upload', upload.single('image'), (req, res) => {
 	res.json({
-		url: `/uploads/${req.file?.originalname}`,
+		url: `${req.file?.originalname}`,
 	})
 })
 
+router.delete('/upload/delete/:filename', deleteFileController)
+
 router.get('/', getProducts)
+router.get('/adminpanel', checkAdmin, getAllProducts)
 router.get('/:id', getProductById)
 router.post('/', registerProductValidator, createProduct)
+router.delete('/deletebyid', checkAdmin, deleteProductById)
 
 router.post('/cart', checkAuth, pushCart)
 router.get('/cart/get', checkAuth, getProductCart)
@@ -48,7 +66,9 @@ router.delete('/cart/delete', checkAuth, deleteCart)
 
 router.get('/auth/adminme', checkAdmin, getMe)
 
+router.patch('/auth/update', checkAuth, updateUser)
 router.get('/auth/me', checkAuth, getMe)
+router.get('/auth/meinfo', checkAuth, getMeInfo)
 router.post('/auth/reg', registerValidator, createUser)
 router.post('/auth/login', registerValidator, loginUser)
 router.delete('/auth/delete', checkAuth, deleteMe)

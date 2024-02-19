@@ -592,6 +592,11 @@ body {
 			flex-direction: column;
 		}
 	}
+	&__img-upload {
+		max-width: 340px;
+		max-height: 340px;
+		margin-bottom: 20px;
+	}
 }
 
 #outlined-basic {
@@ -599,4 +604,103 @@ body {
 	@media (max-width: 420px) {
 		width: 200px;
 	}
+}
+
+.admin {
+	&__list {
+		&-block {
+			overflow: auto;
+			margin: 20px;
+			max-height: 300px;
+		}
+		&-item {
+			display: flex;
+		}
+		&-cell {
+			border: 1px solid #000;
+			min-width: 200px;
+			word-wrap: break-word;
+			&--title {
+				text-align: center;
+				font-weight: 700;
+			}
+			&-delete {
+				font-size: 20px;
+				margin: 0 10px;
+				cursor: pointer;
+			}
+			&:nth-child(5),
+			&:nth-child(7),
+			&:nth-child(8) {
+				min-width: 100px;
+			}
+		}
+	}
+}
+
+.loading-cart {
+	position: absolute;
+	top: calc(50% - 50px);
+	left: calc(50% - 50px);
+	width: 100px;
+	height: 100px;
+	border-radius: 50%;
+	border: 12px dotted $orange;
+	animation-name: loading;
+	animation-duration: 1.3s;
+	animation-iteration-count: infinite;
+}
+
+@keyframes loading {
+	0% {
+		transform: rotate(0deg);
+	}
+	100% {
+		transform: rotate(360deg);
+	}
+}
+
+.popup-update {
+	padding: 20px;
+	position: absolute;
+	top: calc(50% - 430px / 2);
+	left: calc(50% - 330px / 2);
+	background-color: #fff;
+	z-index: 2;
+}
+
+.update-user {
+	&-input {
+		padding: 10px;
+		border: none;
+		border-bottom: 1px solid #000;
+		margin-bottom: 20px;
+		font-size: 20px;
+	}
+	&-label {
+		font-size: 18px;
+	}
+}
+
+.btn-delete-user {
+	background: none;
+	border: none;
+	color: red;
+	font-size: 20px;
+	cursor: pointer;
+	text-align: center;
+	padding: 10px;
+	border-radius: 10px;
+	transition: 0.2s linear;
+	&:hover {
+		color: #fff;
+		background-color: red;
+	}
+}
+
+.settings-block {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
 }

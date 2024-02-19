@@ -1,4 +1,3 @@
-import { getCartLS } from '../../utils/getCartLS'
 import { RootState } from './../store'
 import customAxios from '../../axios'
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit'
@@ -25,12 +24,10 @@ type typeInitialState = {
 	countProduct: { product: string; count: number }[]
 }
 
-const { cartItems } = getCartLS()
-
 const initialState: typeInitialState = {
 	totalPrice: 0,
 	totalCount: 0,
-	cartItems,
+	cartItems: [],
 	countProduct: [],
 	status: Status.LOADING,
 }

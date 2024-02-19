@@ -4,6 +4,7 @@ import { setTotalCount, setTotalPrice } from '../../redux/slices/cartSlice'
 import { Link } from 'react-router-dom'
 import { RootState, useAppDispatch } from '../../redux/store'
 import customAxios from '../../axios'
+import { selectIsAuth } from '../../redux/slices/authSlice'
 
 interface IProductBlock {
 	id: string
@@ -26,6 +27,8 @@ export const ProductBlock: React.FC<IProductBlock> = ({
 		product: '',
 		count: 0,
 	})
+
+	const isAuth = useSelector(selectIsAuth)
 
 	React.useEffect(() => {
 		const target = countProduct?.find((product) => product.product === id)
@@ -78,10 +81,12 @@ export const ProductBlock: React.FC<IProductBlock> = ({
 			<h4 className='product-block__title'>{title}</h4>
 			<div className='product-block__bottom'>
 				<div className='product-block__price'>{price} ₽</div>
-				<button onClick={() => onClickAdd()} className='button button--outline button--add'>
-					<span>Добавить</span>
-					{targetProduct.count !== 0 && <i>{targetProduct.count}</i>}
-				</button>
+				{isAuth && (
+					<button onClick={() => onClickAdd()} className='button button--outline button--add'>
+						<span>Добавить</span>
+						{targetProduct.count !== 0 && <i>{targetProduct.count}</i>}
+					</button>
+				)}
 			</div>
 		</div>
 	)

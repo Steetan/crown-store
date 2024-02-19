@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { useAppDispatch } from '../redux/store'
 import { fetchRegister, selectIsAuth } from '../redux/slices/authSlice'
 import { useSelector } from 'react-redux'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { TextField } from '@mui/material'
 
 export interface FormData {
@@ -108,6 +108,13 @@ const Registration = ({}) => {
 						<button type='submit' className='button button--footer'>
 							Зарегистрироваться
 						</button>
+						<p>
+							Есть аккаунт?
+							<Link to='/auth/login' className='button-link-reg'>
+								{' '}
+								Войти
+							</Link>
+						</p>
 					</div>
 				</form>
 			</div>

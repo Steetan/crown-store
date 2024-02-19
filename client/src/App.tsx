@@ -12,10 +12,8 @@ import customAxios from './axios'
 import { useAppDispatch } from './redux/store'
 import { fetchUserMe } from './redux/slices/authSlice'
 import AdminPanel from './pages/AdminPanel'
+import SettingsUser from './components/SettingsUser/SettingsUser'
 const Cart = React.lazy(() => import('./pages/Cart'))
-// import { fetchUserData } from './redux/slices/authSlice'
-// import { selectIsAuth } from './redux/slices/authSlice'
-// import { useSelector } from 'react-redux'
 
 function App() {
 	const dispatch = useAppDispatch()
@@ -39,12 +37,13 @@ function App() {
 				<Route path='adminpanel' element={<AdminPanel />} />
 				<Route path='auth/login' element={<Login />} />
 				<Route path='auth/reg' element={<Registration />} />
+				<Route path='settings' element={<SettingsUser />} />
 				<Route path='product/:id' element={<FullProduct />} />
 				<Route path='*' element={<NotFound />} />
 				<Route
 					path='cart'
 					element={
-						<React.Suspense fallback={<div>Loading...</div>}>
+						<React.Suspense fallback={<div className='loading-cart'></div>}>
 							<Cart />
 						</React.Suspense>
 					}
