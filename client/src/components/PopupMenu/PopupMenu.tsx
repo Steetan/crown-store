@@ -1,7 +1,9 @@
 import React from 'react'
-import { useAppDispatch } from '../../redux/store'
-import { logout } from '../../redux/slices/authSlice'
+import { RootState, useAppDispatch } from '../../redux/store'
+import { logout, setUserImgUrl } from '../../redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
+import customAxios from '../../axios'
+import { useSelector } from 'react-redux'
 
 interface IPopupMenu {
 	isAuth: any
@@ -9,26 +11,43 @@ interface IPopupMenu {
 
 const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 	const [isVisibleMenu, setIsVisibleMenu] = React.useState(false)
+
 	const dispatch = useAppDispatch()
 	const menuRef = React.useRef<HTMLDivElement>(null)
+
+	const { userImgUrl } = useSelector((state: RootState) => state.authSlice)
 
 	const navigate = useNavigate()
 
 	React.useEffect(() => {
-		const handleClickOutSide = (event: MouseEvent) => {
-			const _event = event as MouseEvent & {
-				path: Node[]
+		try {
+			if (isAuth) {
+				const fetchUserImg = async () => {
+					const { data } = await customAxios.get('/auth/meinfo')
+					dispatch(setUserImgUrl(data.user_imgurl))
+				}
+				fetchUserImg()
 			}
 
-			if (menuRef.current && !_event.composedPath().includes(menuRef.current)) {
-				setIsVisibleMenu(false)
+			const handleClickOutSide = (event: MouseEvent) => {
+				const _event = event as MouseEvent & {
+					path: Node[]
+				}
+
+				if (menuRef.current && !_event.composedPath().includes(menuRef.current)) {
+					setIsVisibleMenu(false)
+				}
 			}
+
+			document.body.addEventListener('click', handleClickOutSide)
+
+			return () => document.body.removeEventListener('click', handleClickOutSide)
+		} catch (error) {
+			console.log(error)
 		}
+	}, [isAuth])
 
-		document.body.addEventListener('click', handleClickOutSide)
-
-		return () => document.body.removeEventListener('click', handleClickOutSide)
-	}, [])
+	console.log('userImgUrl', userImgUrl)
 
 	const onClickLogout = () => {
 		setIsVisibleMenu(!isVisibleMenu)
@@ -42,6 +61,7 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 
 	const onClickItemLogout = async () => {
 		if (window.confirm('Вы действительно хотите выйти?')) {
+			await dispatch(setUserImgUrl(''))
 			await dispatch(logout())
 			resetUser()
 		}
@@ -55,7 +75,21 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 		<>
 			{isAuth && (
 				<div className='btn-avatar' onClick={onClickLogout} ref={menuRef}>
-					<img className='btn-avatar-img' src={require('../../assets/avatar-icon.png')} alt='ava' />
+					{userImgUrl && (
+						<img
+							className='btn-avatar-img'
+							src={`http://localhost:8080/uploads/userIcons/${userImgUrl}`}
+							alt='ava'
+							// onError={require('../../assets/avatar-icon.png')}
+						/>
+					)}
+					{!userImgUrl && (
+						<img
+							className='btn-avatar-img'
+							src={require('../../assets/avatar-icon.png')}
+							alt='ava'
+						/>
+					)}
 				</div>
 			)}
 			{isVisibleMenu && (

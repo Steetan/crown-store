@@ -7,6 +7,7 @@
 @import '../components/ProductBlock/_product-block';
 @import '../components/Aside/aside.module';
 @import '../components/Footer/footer';
+@import '../components/SettingsUser/settingsUser.scss';
 
 #root {
 	height: 100%;
@@ -508,6 +509,7 @@ body {
 	}
 
 	&--empty {
+		min-height: 20vh;
 		margin: 0 auto;
 		text-align: center;
 
@@ -596,6 +598,7 @@ body {
 		max-width: 340px;
 		max-height: 340px;
 		margin-bottom: 20px;
+		border-radius: 10px;
 	}
 }
 
@@ -642,8 +645,8 @@ body {
 	position: absolute;
 	top: calc(50% - 50px);
 	left: calc(50% - 50px);
-	width: 100px;
-	height: 100px;
+	width: 80px;
+	height: 80px;
 	border-radius: 50%;
 	border: 12px dotted $orange;
 	animation-name: loading;
@@ -669,38 +672,22 @@ body {
 	z-index: 2;
 }
 
-.update-user {
-	&-input {
+.custom {
+	&-file-upload {
+		margin: 0 auto;
+		margin-top: 10px;
+		transition: 0.2s linear;
 		padding: 10px;
-		border: none;
-		border-bottom: 1px solid #000;
-		margin-bottom: 20px;
-		font-size: 20px;
+		border-radius: 10px;
+		&:hover {
+			color: #fff;
+			background-color: #000;
+		}
 	}
-	&-label {
-		font-size: 18px;
+	&-block-img {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 10px;
 	}
-}
-
-.btn-delete-user {
-	background: none;
-	border: none;
-	color: red;
-	font-size: 20px;
-	cursor: pointer;
-	text-align: center;
-	padding: 10px;
-	border-radius: 10px;
-	transition: 0.2s linear;
-	&:hover {
-		color: #fff;
-		background-color: red;
-	}
-}
-
-.settings-block {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 20px;
 }

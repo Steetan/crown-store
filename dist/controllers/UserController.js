@@ -12,6 +12,7 @@ import { validationResult } from '../../node_modules/express-validator/src/valid
 import bcrypt from 'bcrypt';
 import { v4 as uuidv4 } from 'uuid';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
 export const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let passwordByEmail = {
@@ -47,7 +48,6 @@ export const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, functio
         }, 'secret123', {
             expiresIn: '30d',
         });
-        console.log('token', passwordByEmail.rows);
         res.status(200).json({
             success: true,
             token,
@@ -75,7 +75,7 @@ export const createUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
         const salt = yield bcrypt.genSalt(10);
         const passwordHash = yield bcrypt.hash(password, salt);
         const id = uuidv4();
-        pool.query('INSERT INTO users (id, name_user, fname_user, oname_user, password, phone_number, email, access) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);', [
+        pool.query('INSERT INTO users (id, name_user, fname_user, oname_user, password, phone_number, email, access, user_imgurl) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);', [
             id,
             req.body.name,
             req.body.fname,
@@ -84,6 +84,7 @@ export const createUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
             req.body.phone,
             req.body.email,
             false,
+            req.body.url,
         ], (error, results) => {
             if (error)
                 throw error;
@@ -135,10 +136,11 @@ export const getMeInfo = (req, res) => __awaiter(void 0, void 0, void 0, functio
                 res.json({ error: 'Неверный токен' });
             }
             else {
-                pool.query('SELECT name_user, fname_user, oname_user FROM users WHERE id = $1', [decoded.id], (error, results) => {
+                pool.query('SELECT name_user, fname_user, oname_user, user_imgurl FROM users WHERE id = $1', [decoded.id], (error, results) => {
                     if (error)
                         throw error;
                     res.json(results.rows[0]);
+                    console.log('results', results.rows);
                 });
                 // return res.status(200).json({
                 // 	decoded,
@@ -152,27 +154,6 @@ export const getMeInfo = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
 });
-// export const getMeAdmin = async (req: Request, res: Response) => {
-// 	try {
-// 		const token = (req.headers.authorization || '').replace(/Bearer\s?/, '')
-// 		jwt.verify(token, 'secret123', (err: jwt.VerifyErrors | null, decoded: any) => {
-// 			if (err) {
-// 				res.json({ error: 'Неверный токен' })
-// 			} else {
-// 				pool.query('SELECT FROM users WHERE id = $1 AND access = true', [decoded.id], () => {
-// 					res.status(200).json({
-// 						success: true,
-// 						decoded,
-// 					})
-// 				})
-// 			}
-// 		})
-// 	} catch (error) {
-// 		res.status(400).json({
-// 			message: 'Нет доступа',
-// 		})
-// 	}
-// }
 export const deleteMe = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
@@ -199,13 +180,17 @@ export const deleteMe = (req, res) => __awaiter(void 0, void 0, void 0, function
 });
 export const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(403).json({ error: errors.array() });
+        }
         const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
         jwt.verify(token, 'secret123', (err, decoded) => {
             if (err) {
                 res.status(401).json({ error: 'Неверный токен' });
             }
             else {
-                pool.query('UPDATE users set name_user = $1, fname_user = $2, oname_user = $3 WHERE id=$4', [req.body.name, req.body.fname, req.body.oname, decoded.id], (error, results) => {
+                pool.query('UPDATE users SET name_user = $1, fname_user = $2, oname_user = $3 WHERE id=$4', [req.body.name, req.body.fname, req.body.oname, decoded.id], (error, results) => {
                     if (error)
                         throw error;
                     res.status(200).json({ message: 'Данные были обновлены успешно!' });
@@ -219,3 +204,136 @@ export const updateUser = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
 });
+export const updateUserImg = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
+        jwt.verify(token, 'secret123', (err, decoded) => {
+            if (err) {
+                res.status(401).json({ error: 'Неверный токен' });
+            }
+            else {
+                pool.query('UPDATE users SET user_imgurl = $1 WHERE id=$2', [req.body.img, decoded.id], (error, results) => {
+                    if (error)
+                        throw error;
+                    res.status(200).json({ message: 'Аватарка обновилась!' });
+                });
+            }
+        });
+    }
+    catch (error) {
+        res.status(403).json({
+            message: 'Нет доступа',
+        });
+    }
+});
+export const updatePasswordUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(403).json({ error: errors.array() });
+        }
+        const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
+        const password = req.body.password;
+        const salt = yield bcrypt.genSalt(10);
+        const passwordHash = yield bcrypt.hash(password, salt);
+        jwt.verify(token, 'secret123', (err, decoded) => {
+            if (err) {
+                res.status(401).json({ error: 'Неверный токен' });
+            }
+            else {
+                pool.query('UPDATE users SET password = $1 WHERE id=$2', [passwordHash, decoded.id], (error, results) => {
+                    if (error)
+                        throw error;
+                    res.status(200).json({ message: 'Пароль был обновлен успешно!' });
+                });
+            }
+        });
+    }
+    catch (error) {
+        res.status(403).json({
+            message: 'Нет доступа',
+        });
+    }
+});
+export const deleteUserImg = (req, res) => {
+    try {
+        const filePath = `uploads/userIcons/${req.params.filename}`;
+        const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
+        jwt.verify(token, 'secret123', (err, decoded) => {
+            if (err) {
+                res.status(401).json({ error: 'Неверный токен' });
+            }
+            else {
+                pool.query(`SELECT user_imgurl FROM users WHERE user_imgurl = $1 AND id <> $2`, [req.params.filename, decoded.id], (error, results) => {
+                    if (error)
+                        throw error;
+                    if (!results.rows.length) {
+                        fs.stat(filePath, (err, stats) => {
+                            if (err) {
+                                if (err.code === 'ENOENT') {
+                                    return res.status(404).json({ message: 'File not found' });
+                                }
+                                else {
+                                    console.error(err);
+                                    return res.status(500).json({ message: 'Internal server error' });
+                                }
+                            }
+                            fs.unlink(filePath, (err) => {
+                                if (err) {
+                                    console.error(err);
+                                    return res.status(500).json({ message: 'Error deleting file' });
+                                }
+                                return res.json({ message: 'File deleted successfully' });
+                            });
+                        });
+                    }
+                    else {
+                        return res.json({ message: 'Не удалось удалить файл' });
+                    }
+                });
+            }
+        });
+    }
+    catch (error) {
+        res.status(403).json({
+            message: 'Нет доступа',
+        });
+    }
+};
+export const deleteAuthImg = (req, res) => {
+    try {
+        const filePath = `uploads/userIcons/${req.params.filename}`;
+        pool.query(`SELECT user_imgurl FROM users WHERE user_imgurl ILIKE ${"'%" + filePath + "%'"}`, (error, results) => {
+            if (error)
+                throw error;
+            if (!results.rows.length) {
+                fs.stat(filePath, (err, stats) => {
+                    if (err) {
+                        if (err.code === 'ENOENT') {
+                            return res.status(404).json({ message: 'File not found' });
+                        }
+                        else {
+                            console.error(err);
+                            return res.status(500).json({ message: 'Internal server error' });
+                        }
+                    }
+                    fs.unlink(filePath, (err) => {
+                        if (err) {
+                            console.error(err);
+                            return res.status(500).json({ message: 'Error deleting file' });
+                        }
+                        return res.json({ message: 'File deleted successfully' });
+                    });
+                });
+            }
+            else {
+                return res.status(400).json({ message: 'Не удалось удалить файл' });
+            }
+        });
+    }
+    catch (error) {
+        res.status(403).json({
+            message: 'Нет доступа',
+        });
+    }
+};

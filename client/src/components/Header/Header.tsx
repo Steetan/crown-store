@@ -12,10 +12,16 @@ export const Header: React.FC = () => {
 	const isAuth = useSelector(selectIsAuth)
 	const { totalPrice } = useSelector(selectCart)
 	const { totalCount } = useSelector((state: RootState) => state.cartSlice)
+	const { userImgUrl } = useSelector((state: RootState) => state.authSlice)
 	const location = useLocation()
 	const dispatch = useAppDispatch()
 
-	const isLoginPage = location.pathname === '/auth/login' || location.pathname === '/auth/reg'
+	const isLoginPage =
+		location.pathname === '/auth/login' ||
+		location.pathname === '/auth/reg' ||
+		location.pathname === '/settings'
+
+	console.log(userImgUrl)
 
 	return (
 		<div className='header'>

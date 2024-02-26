@@ -29,14 +29,12 @@ export const pushCart = (req, res) => {
 };
 export const updateCart = (req, res) => {
     const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
-    console.log(req.body.act);
     jwt.verify(token, 'secret123', (err, decoded) => {
         if (err) {
             res.status(400).json({ error: 'Неверный токен' });
         }
         else {
             if (req.body.act === 'plus') {
-                console.log('grand', req.body.totalcount, req.body.productid);
                 pool.query(`UPDATE carts SET totalcount = totalcount + 1 WHERE user_id=$1 AND product_id=$2`, [decoded.id, req.body.productid], (error, results) => {
                     if (error)
                         throw error;
@@ -69,7 +67,6 @@ export const getProductCart = (req, res) => {
                 pool.query('SELECT * FROM carts WHERE user_id = $1', [decoded.id], (error, results) => {
                     if (error)
                         throw error;
-                    console.log(results.rows);
                     if (results.rows.length) {
                         return res.status(200).json({
                             value: true,
@@ -95,7 +92,6 @@ export const getProductCart = (req, res) => {
 export const getProductCartById = (req, res) => {
     const token = (req.headers.authorization || '').replace(/Bearer\s?/, '');
     try {
-        console.log(req.query.product);
         jwt.verify(token, 'secret123', (err, decoded) => {
             if (err) {
                 res.status(400).json({ error: 'Неверный токен' });
@@ -149,7 +145,7 @@ export const deleteCart = (req, res) => {
             res.status(400).json({ error: 'Неверный токен' });
         }
         else {
-            pool.query(`DELETE FROM carts`, (error, results) => {
+            pool.query(`DELETE FROM carts WHERE user_id = $1`, [decoded.id], (error, results) => {
                 if (error)
                     throw error;
                 return res.status(200).json({ message: 'cart has been cleaned' });

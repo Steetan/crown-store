@@ -1,12 +1,22 @@
 import { body } from '../node_modules/express-validator/src/index.js'
 
 export const registerValidator = [
-	body('name', 'Укажите имя').isLength({ min: 3 }),
+	body('name', 'Укажите имя').isLength({ min: 1 }),
 	body('oname', 'Укажите отчество').isLength({ min: 3 }),
 	body('fname', 'Укажите фамилию').isLength({ min: 3 }),
 	body('email', 'Неверный формат почты').isEmail(),
 	body('password', 'Пароль должен быть минимум 6 символов').isLength({ min: 6 }),
-	body('phone', 'Неверный формат телефона').isLength({ min: 11 }),
+	// body('phone', 'Неверный формат телефона').isLength({ min: 11 }),
+]
+
+export const updateValidator = [
+	body('name', 'Укажите имя').isLength({ min: 1 }),
+	body('oname', 'Укажите отчество').isLength({ min: 3 }),
+	body('fname', 'Укажите фамилию').isLength({ min: 3 }),
+]
+
+export const updatePasswordValidator = [
+	body('password', 'Пароль должен быть минимум 6 символов').isLength({ min: 6 }),
 ]
 
 export const registerProductValidator = [

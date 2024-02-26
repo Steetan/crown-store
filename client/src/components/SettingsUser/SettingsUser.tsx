@@ -1,13 +1,21 @@
 import React from 'react'
 import customAxios from '../../axios'
-import { useAppDispatch } from '../../redux/store'
-import { fetchDeleteMe } from '../../redux/slices/authSlice'
+import { RootState, useAppDispatch } from '../../redux/store'
+import { fetchDeleteMe, setUserImgUrl } from '../../redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 const SettingsUser = ({}) => {
 	const [userDataName, setUserDataName] = React.useState('')
 	const [userDataFname, setUserDataFname] = React.useState('')
 	const [userDataOname, setUserDataOname] = React.useState('')
+
+	const inputFileRef = React.useRef<HTMLInputElement>(null)
+
+	const { userImgUrl } = useSelector((state: RootState) => state.authSlice)
+
+	const [userPassword, setUserPassword] = React.useState('')
+	const [userPasswordRepeat, setUserPasswordRepeat] = React.useState('')
 
 	const dispatch = useAppDispatch()
 	const navigate = useNavigate()
@@ -47,41 +55,181 @@ const SettingsUser = ({}) => {
 			}
 		} catch (error) {
 			console.log(error)
+			alert('Не удалось обновить данные')
 		}
 	}
 
+	const onClickUpdatePassword = async () => {
+		try {
+			if (userPassword && userPassword === userPasswordRepeat) {
+				const { data } = await customAxios.patch('/auth/updpass', {
+					password: userPassword,
+				})
+				data && alert('Пароль был успешно изменен')
+			}
+		} catch (error) {
+			console.log(error)
+			alert('Не удалось обновить пароль')
+		}
+	}
+
+	const handleFileChange = async (event: any) => {
+		try {
+			const formData = new FormData()
+			formData.append('image', event.target.files[0])
+
+			customAxios.post('http://localhost:8080/upload/user', formData).then(({ data }) => {
+				dispatch(setUserImgUrl(`${data.url}`))
+			})
+		} catch (error) {
+			console.warn(error)
+		}
+	}
+
+	const onClickUpdateImg = async () => {
+		try {
+			if (userImgUrl) {
+				const { data } = await customAxios.patch('/auth/updimg', {
+					img: userImgUrl,
+				})
+				data && alert('Аватарка была успешно изменена')
+			}
+		} catch (error) {
+			console.log(error)
+			alert('Не удалось обновить аватарку')
+		}
+	}
+
+	const deleteImg = () => {
+		try {
+			customAxios.delete(`http://localhost:8080/upload/user/delete/${userImgUrl}`)
+			if (inputFileRef.current) {
+				inputFileRef.current.value = ''
+			}
+			dispatch(setUserImgUrl(''))
+		} catch (error) {
+			console.log(error)
+		}
+	}
+
+	console.log('userimg', userImgUrl)
+
 	return (
-		<div className='settings-block'>
-			<div className='form-block'>
-				<h3 className='form-block__title'>Поменять данные</h3>
-				<h4 className='update-user-label'>Имя</h4>
-				<input
-					className='update-user-input'
-					type='text'
-					value={userDataName}
-					onChange={(e) => setUserDataName(e.target.value)}
-				/>
-				{!userDataName && <p style={{ color: 'red', marginBottom: 10 }}>Введите имя</p>}
-				<h4 className='update-user-label'>Фамилия</h4>
-				<input
-					className='update-user-input'
-					type='text'
-					value={userDataFname}
-					onChange={(e) => setUserDataFname(e.target.value)}
-				/>
-				{!userDataFname && <p style={{ color: 'red', marginBottom: 10 }}>Введите фамилию</p>}
-				<h4 className='update-user-label'>Отчество</h4>
-				<input
-					className='update-user-input'
-					type='text'
-					value={userDataOname}
-					onChange={(e) => setUserDataOname(e.target.value)}
-				/>
-				<button type='submit' className='button button--footer' onClick={onSubmit}>
-					Изменить
-				</button>
+		<div className='settings'>
+			<h2 className='settings__title'>Настройки аккаунта</h2>
+			<div className='settings__main-block'>
+				<div>
+					<div className='form-block'>
+						<h3 className='form-block__title'>Поменять данные</h3>
+						<h4 className='settings__label'>Имя</h4>
+						<input
+							className='settings__input'
+							type='text'
+							value={userDataName}
+							onChange={(e) => setUserDataName(e.target.value)}
+						/>
+						{!userDataName && <p style={{ color: 'red', marginBottom: 10 }}>Введите имя</p>}
+						<h4 className='settings__label'>Фамилия</h4>
+						<input
+							className='settings__input'
+							type='text'
+							value={userDataFname}
+							onChange={(e) => setUserDataFname(e.target.value)}
+						/>
+						{!userDataFname && <p style={{ color: 'red', marginBottom: 10 }}>Введите фамилию</p>}
+						<h4 className='settings__label'>Отчество</h4>
+						<input
+							className='settings__input'
+							type='text'
+							value={userDataOname}
+							onChange={(e) => setUserDataOname(e.target.value)}
+						/>
+						<button type='submit' className='button button--footer' onClick={onSubmit}>
+							Обновить
+						</button>
+					</div>
+				</div>
+				<div className='settings__block-right'>
+					<div className='settings__password-block'>
+						<h3 className='form-block__title settings__password-title'>Новый пароль</h3>
+						<div className='settings__password-inputs'>
+							<div className='settings__password-input'>
+								<div>
+									<h4 className='settings__label'>Пароль</h4>
+									<input
+										className='settings__input'
+										type='password'
+										value={userPassword}
+										onChange={(e) => setUserPassword(e.target.value)}
+									/>
+								</div>
+								{/* {!userPassword && <p style={{ color: 'red', marginBottom: 10 }}>Введите пароль</p>} */}
+							</div>
+							<div className='settings__password-hr'></div>
+							<div className='settings__password-input'>
+								<div>
+									<h4 className='settings__label'>Пароль ещё раз</h4>
+									<input
+										className='settings__input'
+										type='password'
+										value={userPasswordRepeat}
+										onChange={(e) => setUserPasswordRepeat(e.target.value)}
+									/>
+								</div>
+								{/* {!userPasswordRepeat && (
+									<p style={{ color: 'red', marginBottom: 10 }}>Введите пароль еще раз</p>
+								)} */}
+							</div>
+						</div>
+						{userPassword !== userPasswordRepeat && (
+							<p style={{ color: 'red', marginBottom: 10, textAlign: 'center' }}>
+								Пароли не совпадают
+							</p>
+						)}
+						<div className='settings__btn-password-block'>
+							<button
+								className='button button--footer settings__btn-password-update'
+								onClick={onClickUpdatePassword}
+							>
+								Обновить пароль
+							</button>
+						</div>
+					</div>
+
+					{!userImgUrl && (
+						<label htmlFor='file-upload' className='custom-file-upload'>
+							Загрузить фото
+						</label>
+					)}
+					<input
+						id='file-upload'
+						ref={inputFileRef}
+						type='file'
+						style={{ display: 'none' }}
+						onChange={handleFileChange}
+					/>
+
+					{userImgUrl && (
+						<button className='settings__btn-delete' onClick={deleteImg}>
+							Удалить
+						</button>
+					)}
+					<img
+						className='form-block__img-upload'
+						src={`http://localhost:8080/uploads/userIcons/${userImgUrl}`}
+						alt=''
+					/>
+					{userImgUrl && (
+						<button className='button button--footer' onClick={onClickUpdateImg}>
+							Обновить аватарку
+						</button>
+					)}
+				</div>
 			</div>
-			<button className='btn-delete-user' onClick={onClickItemDelete}>
+			<button
+				className='settings__btn-delete settings__btn-delete--acc'
+				onClick={onClickItemDelete}
+			>
 				Удалить аккаунт
 			</button>
 		</div>

@@ -58,7 +58,7 @@ const Login = ({}) => {
 						{errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
 					</div>
 					<div className='form-block__btns-login'>
-						<button type='submit' className='button button-login'>
+						<button type='submit' className='button button-login button--footer'>
 							Войти
 						</button>
 						<p>

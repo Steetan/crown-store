@@ -35,23 +35,35 @@ const AdminPanel: React.FC = () => {
 	} = useForm<DataProduct>()
 
 	React.useEffect(() => {
-		customAxios.get(`http://localhost:8080/adminpanel`).then(({ data }) => {
-			setFetchData(data)
-		})
+		try {
+			customAxios.get(`http://localhost:8080/adminpanel`).then(({ data }) => {
+				setFetchData(data)
+			})
+		} catch (error) {
+			console.log(error)
+		}
 	}, [])
 
 	React.useEffect(() => {
-		const fetchMe = async () => {
-			const data = await dispatch(fetchAdminMe())
-			if (data.payload.error) {
-				setHasError(true)
+		try {
+			const fetchMe = async () => {
+				const data = await dispatch(fetchAdminMe())
+				if (data.payload.error) {
+					setHasError(true)
+				}
 			}
+			fetchMe()
+		} catch (error) {
+			console.log(error)
 		}
-		fetchMe()
 	}, [dispatch])
 
 	if (hasError) {
 		return <NotFound />
+	}
+
+	if (!fetchData || !Array.isArray(fetchData)) {
+		return <div className='loading-cart'></div>
 	}
 
 	const handleFileChange = async (event: any) => {
@@ -109,8 +121,6 @@ const AdminPanel: React.FC = () => {
 		}
 	}
 
-	console.log(isVisiblePopupUpdate)
-
 	return (
 		<div>
 			<div className='form-block'>
@@ -167,7 +177,7 @@ const AdminPanel: React.FC = () => {
 						{errors.totalcount && <p style={{ color: 'red' }}>{errors.totalcount.message}</p>}
 						{!imgUrl && (
 							<label htmlFor='file-upload' className='custom-file-upload'>
-								Выберите файл
+								Загрузить фото
 							</label>
 						)}
 						<input
@@ -176,16 +186,22 @@ const AdminPanel: React.FC = () => {
 							type='file'
 							style={{ display: 'none' }}
 							onChange={handleFileChange}
-							// {...register('fileimg', { required: 'Добавьте файл', onChange: handleFileChange })}
 						/>
-						{errors.fileimg && <p style={{ color: 'red' }}>{errors.fileimg.message}</p>}
 					</div>
-					<img
-						className='form-block__img-upload'
-						src={`http://localhost:8080/uploads/${imgUrl}`}
-						alt=''
-					/>
-					{imgUrl && <button onClick={deleteImg}>del</button>}
+					{imgUrl && (
+						<div className='custom-block-img'>
+							<img
+								className='form-block__img-upload'
+								src={`http://localhost:8080/uploads/${imgUrl}`}
+								alt=''
+							/>
+							{imgUrl && (
+								<button className='settings__btn-delete' onClick={deleteImg}>
+									Удалить
+								</button>
+							)}
+						</div>
+					)}
 					<div className='form-block__btns'>
 						<button type='submit' className='button button--footer'>
 							Добавить продукт
@@ -204,32 +220,33 @@ const AdminPanel: React.FC = () => {
 					<div className='admin__list-cell admin__list-cell--title'>rating</div>
 					<div className='admin__list-cell admin__list-cell--title'>totalcount</div>
 				</div>
-				{fetchData.map((item: DataProduct) => (
-					<>
-						<div className='admin__list-item'>
-							<div className='admin__list-cell'>{item.id}</div>
-							<div className='admin__list-cell'>{item.title}</div>
-							<div className='admin__list-cell'>{item.description}</div>
-							<div className='admin__list-cell'>{item.price}</div>
-							<div className='admin__list-cell'>{item.category}</div>
-							<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'null'}</div>
-							<div className='admin__list-cell'>{item.rating}</div>
-							<div className='admin__list-cell'>{item.totalcount}</div>
-							<div
-								className='admin__list-cell-delete'
-								onClick={() => deleteItem(item.id ? item.id : '', item.title)}
-							>
-								x
+				{!hasError &&
+					fetchData.map((item: DataProduct) => (
+						<>
+							<div className='admin__list-item'>
+								<div className='admin__list-cell'>{item.id}</div>
+								<div className='admin__list-cell'>{item.title}</div>
+								<div className='admin__list-cell'>{item.description}</div>
+								<div className='admin__list-cell'>{item.price}</div>
+								<div className='admin__list-cell'>{item.category}</div>
+								<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'null'}</div>
+								<div className='admin__list-cell'>{item.rating}</div>
+								<div className='admin__list-cell'>{item.totalcount}</div>
+								<div
+									className='admin__list-cell-delete'
+									onClick={() => deleteItem(item.id ? item.id : '', item.title)}
+								>
+									x
+								</div>
+								<div
+									className='admin__list-cell-delete'
+									onClick={() => setIsVisiblePopupUpdate(true)}
+								>
+									u
+								</div>
 							</div>
-							<div
-								className='admin__list-cell-delete'
-								onClick={() => setIsVisiblePopupUpdate(true)}
-							>
-								u
-							</div>
-						</div>
-					</>
-				))}
+						</>
+					))}
 			</div>
 			{/* {isVisiblePopupUpdate && (
 				<div className='popup-update'>

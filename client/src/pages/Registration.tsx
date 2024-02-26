@@ -1,10 +1,12 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
-import { useAppDispatch } from '../redux/store'
-import { fetchRegister, selectIsAuth } from '../redux/slices/authSlice'
+import { RootState, useAppDispatch } from '../redux/store'
+import { fetchRegister, selectIsAuth, setUserImgUrl } from '../redux/slices/authSlice'
 import { useSelector } from 'react-redux'
 import { Link, Navigate } from 'react-router-dom'
 import { TextField } from '@mui/material'
+import customAxios from '../axios'
+import axios from 'axios'
 
 export interface FormData {
 	name: string
@@ -14,11 +16,15 @@ export interface FormData {
 	phone: number
 	password: string
 	confirmPassword: string
+	url?: string
 }
 
 const Registration = ({}) => {
 	const dispatch = useAppDispatch()
 	const isAuth = useSelector(selectIsAuth)
+	const { userImgUrl } = useSelector((state: RootState) => state.authSlice)
+
+	const inputFileRef = React.useRef<HTMLInputElement>(null)
 
 	const {
 		register,
@@ -27,7 +33,7 @@ const Registration = ({}) => {
 	} = useForm<FormData>()
 
 	const onSubmit = async (values: FormData) => {
-		const data = await dispatch(fetchRegister(values))
+		const data = await dispatch(fetchRegister({ ...values, url: userImgUrl }))
 
 		if (!data.payload) {
 			return alert('Не удалось зарегистрироваться!')
@@ -40,6 +46,31 @@ const Registration = ({}) => {
 
 	if (isAuth) {
 		return <Navigate to='/' />
+	}
+
+	const handleFileChange = async (event: any) => {
+		try {
+			const formData = new FormData()
+			formData.append('image', event.target.files[0])
+
+			customAxios.post('http://localhost:8080/upload/user', formData).then(({ data }) => {
+				dispatch(setUserImgUrl(`${data.url}`))
+			})
+		} catch (error) {
+			console.warn(error)
+		}
+	}
+
+	const deleteImg = () => {
+		try {
+			axios.delete(`http://localhost:8080/upload/auth/delete/${userImgUrl}`)
+			if (inputFileRef.current) {
+				inputFileRef.current.value = ''
+			}
+			dispatch(setUserImgUrl(''))
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (
@@ -103,6 +134,29 @@ const Registration = ({}) => {
 							{...register('password', { required: 'Укажите пароль' })}
 						/>
 						{errors.password && <p style={{ color: 'red' }}>{errors.password.message}</p>}
+						{!userImgUrl && (
+							<label htmlFor='file-upload' className='custom-file-upload'>
+								Загрузить фото
+							</label>
+						)}
+						<input
+							id='file-upload'
+							ref={inputFileRef}
+							type='file'
+							style={{ display: 'none' }}
+							onChange={handleFileChange}
+						/>
+
+						{userImgUrl && (
+							<button className='settings__btn-delete' onClick={deleteImg}>
+								Удалить
+							</button>
+						)}
+						<img
+							className='form-block__img-upload'
+							src={`http://localhost:8080/uploads/userIcons/${userImgUrl}`}
+							alt=''
+						/>
 					</div>
 					<div className='form-block__btns'>
 						<button type='submit' className='button button--footer'>

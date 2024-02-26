@@ -1,0 +1,86 @@
+.settings {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	&__title {
+		font-size: 30px;
+		text-align: center;
+		margin-bottom: 30px;
+	}
+
+	&__main-block {
+		justify-content: center;
+		display: flex;
+		gap: 20px;
+	}
+
+	&__block {
+		&-right {
+			min-height: 100%;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 20px;
+		}
+	}
+
+	&__input {
+		padding: 10px;
+		border: none;
+		border-bottom: 1px solid #000;
+		margin-bottom: 20px;
+		font-size: 20px;
+		max-width: 200px;
+	}
+
+	&__label {
+		font-size: 18px;
+	}
+
+	&__btn-delete {
+		background: none;
+		border: none;
+		color: red;
+		font-size: 20px;
+		cursor: pointer;
+		text-align: center;
+		padding: 10px;
+		border-radius: 10px;
+		transition: 0.2s linear;
+		&:hover {
+			color: #fff;
+			background-color: red;
+		}
+	}
+
+	&__password {
+		&-title {
+			text-align: center;
+			margin-bottom: 20px;
+		}
+		&-block {
+			border: 3px solid #8d8d8d;
+			padding: 10px;
+			border-radius: 10px;
+		}
+		&-inputs {
+			display: flex;
+			gap: 10px;
+		}
+		&-input:first-child {
+			border-right: 2px solid #555555;
+			padding-right: 15px;
+		}
+	}
+	&__btn-password {
+		&-block {
+			display: flex;
+			justify-content: center;
+			margin-top: 10px;
+		}
+		&-update {
+			display: flex;
+		}
+	}
+}

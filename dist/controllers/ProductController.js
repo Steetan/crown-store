@@ -13,7 +13,6 @@ export const getProducts = (req, res) => {
     let toRange = parseInt(req.query.toRange);
     let selectedRating = req.query.selectedRatingFilter;
     let parseSelectedRating = '';
-    // console.log(category)
     switch (selectedRating) {
         case '0':
             parseSelectedRating = 'rating >= 4';
@@ -39,21 +38,14 @@ export const getProducts = (req, res) => {
         queryString += Boolean(parseSelectedRating) ? `AND ${parseSelectedRating} ` : '';
     }
     queryString += `ORDER BY ${sortBy} ${order}`;
-    // console.log('category', category)
-    // console.log(queryString)
     pool.query(queryString, (error, results) => {
         if (error)
             throw error;
         let startIndex = (page - 1) * limit;
         let endIndex = page * limit;
         let paginatedResults = results.rows.slice(startIndex, endIndex);
-        console.log(results.rows.length);
         let totalProducts = results.rows.length;
         let totalPages = Math.ceil(totalProducts / limit);
-        // console.log('totalpages', totalProducts / limit)
-        // console.log('totalproducts', results.rows)
-        // console.log('limit', limit)
-        console.log(totalPages);
         res.json({
             products: paginatedResults,
             totalPages: totalPages,
@@ -115,7 +107,6 @@ export const deleteFileController = (req, res) => {
                         console.error(err);
                         return res.status(500).json({ message: 'Error deleting file' });
                     }
-                    console.log('File deleted successfully');
                     return res.json({ message: 'File deleted successfully' });
                 });
             });

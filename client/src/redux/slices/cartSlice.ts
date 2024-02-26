@@ -59,7 +59,6 @@ const cartSlice = createSlice({
 			state.status = Status.LOADING
 		})
 		builder.addCase(getCart.fulfilled, (state, action) => {
-			console.log(action.payload)
 			state.status = Status.SUCCESS
 			state.cartItems = action.payload.results
 		})

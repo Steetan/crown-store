@@ -29,9 +29,13 @@ export const fetchAdminMe = createAsyncThunk('auth/fetchAdminMe', async () => {
 
 export const fetchDeleteMe = createAsyncThunk(
 	'auth/fetchUserDataMe',
-	async (params: string | null) => {
-		const { data } = await customAxios.delete(`http://localhost:8080/auth/delete?token=${params}`)
-		return data
+	async (params: string | null, { rejectWithValue }) => {
+		try {
+			const { data } = await customAxios.delete(`http://localhost:8080/auth/delete?token=${params}`)
+			return data
+		} catch (error: any) {
+			return rejectWithValue(error.message)
+		}
 	},
 )
 
@@ -44,11 +48,13 @@ export enum Status {
 type TypeAuthState = {
 	data: any
 	status: string
+	userImgUrl: string
 }
 
 const initialState: TypeAuthState = {
 	data: null,
 	status: Status.LOADING,
+	userImgUrl: '',
 }
 
 const authSlice = createSlice({
@@ -57,6 +63,9 @@ const authSlice = createSlice({
 	reducers: {
 		logout: (state) => {
 			state.data = null
+		},
+		setUserImgUrl: (state, action) => {
+			state.userImgUrl = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -108,4 +117,4 @@ export const selectIsAuthAdmin = (state: RootState) => Boolean(state.authSlice.d
 
 export default authSlice.reducer
 
-export const { logout } = authSlice.actions
+export const { logout, setUserImgUrl } = authSlice.actions

@@ -9,7 +9,6 @@ import { useAppDispatch, RootState } from '../../redux/store'
 export const Pagination: React.FC<{ allPages: number }> = ({ allPages }) => {
 	const dispatch = useAppDispatch()
 	const initPage = useSelector((state: RootState) => state.filterSlice.selectedPage)
-	console.log(allPages)
 	return (
 		<ReactPaginate
 			className={styles.paginationBlock}
