@@ -24,11 +24,11 @@ export const getProducts = (req, res) => {
             parseSelectedRating = '';
             break;
     }
-    let queryString = `SELECT * FROM product ${!search && category ? `WHERE category=${category}` : ''} ${search ? `WHERE title ILIKE ${"'%" + search + "%'"} ` : ''}`;
+    let queryString = `SELECT * FROM product ${!search && category ? `WHERE avail = TRUE AND category=${category}` : ''} ${search ? `WHERE avail = TRUE AND title ILIKE ${"'%" + search + "%'"} ` : ''}`;
     if (!category && !search) {
         queryString += toRange
-            ? `WHERE price >= ${fromRange} AND price <= ${toRange} `
-            : `WHERE price >= ${fromRange} `;
+            ? `WHERE avail = TRUE AND price >= ${fromRange} AND price <= ${toRange} `
+            : `WHERE avail = TRUE AND price >= ${fromRange} `;
         queryString += parseSelectedRating !== '' ? `AND ${parseSelectedRating} ` : '';
     }
     if (category || search) {
@@ -59,21 +59,38 @@ export const getProductById = (req, res) => {
         res.status(200).json(results.rows);
     });
 };
+export const updateProduct = (req, res) => {
+    console.log('updateProduct', req.body);
+    pool.query('UPDATE product SET title = $1, description = $2, price = $3, category = $4, imgurl = $5, rating = $6, avail = $7 WHERE id = $8', [
+        req.body.title,
+        req.body.description,
+        req.body.price,
+        req.body.category,
+        req.body.fileimg,
+        req.body.rating,
+        req.body.avail,
+        req.body.id,
+    ], (error, results) => {
+        if (error)
+            throw error;
+        res.status(200).json(results.rows);
+    });
+};
 export const createProduct = (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json(errors.array());
         }
-        pool.query('INSERT INTO product (id, title, description, price, category, imgurl, rating, totalcount) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [
+        pool.query('INSERT INTO product (id, title, description, price, category, imgurl, rating, avail) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [
             uuidv4(),
             req.body.title,
             req.body.description,
             req.body.price,
             req.body.category,
-            `http://localhost:8080/uploads/${req.body.fileimg}`,
+            req.body.fileimg,
             req.body.rating,
-            req.body.totalcount,
+            req.body.avail,
         ], (error, results) => {
             if (error)
                 throw error;
@@ -124,9 +141,26 @@ export const getAllProducts = (req, res) => {
     });
 };
 export const deleteProductById = (req, res) => {
-    pool.query('DELETE FROM product WHERE id = $1', [req.query.product], (error, results) => {
-        if (error)
-            throw error;
-        res.status(200).json({ message: 'product has been deleted' });
-    });
+    try {
+        pool.query('DELETE FROM product WHERE id = $1', [req.query.product], (error, results) => {
+            if (error)
+                throw error;
+            res.status(200).json({ message: 'product has been deleted' });
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
+};
+export const deleteProducts = (req, res) => {
+    try {
+        pool.query('DELETE FROM product', (error, results) => {
+            if (error)
+                throw error;
+            res.status(200).json({ message: 'products has been deleted' });
+        });
+    }
+    catch (error) {
+        console.log(error);
+    }
 };

@@ -161,12 +161,8 @@ export const getMeInfo = async (req: Request, res: Response) => {
 					(error: Error, results: QueryResult) => {
 						if (error) throw error
 						res.json(results.rows[0])
-						console.log('results', results.rows)
 					},
 				)
-				// return res.status(200).json({
-				// 	decoded,
-				// })
 			}
 		})
 	} catch (error) {

@@ -19,7 +19,8 @@ export const Header: React.FC = () => {
 	const isLoginPage =
 		location.pathname === '/auth/login' ||
 		location.pathname === '/auth/reg' ||
-		location.pathname === '/settings'
+		location.pathname === '/settings' ||
+		location.pathname === '/adminpanel'
 
 	console.log(userImgUrl)
 

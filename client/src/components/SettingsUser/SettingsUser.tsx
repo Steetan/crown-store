@@ -24,6 +24,7 @@ const SettingsUser = ({}) => {
 		const fetchMe = async () => {
 			const { data } = await customAxios.get('auth/meinfo')
 
+			console.log(data)
 			setUserDataName(data.name_user)
 			setUserDataFname(data.fname_user)
 			setUserDataOname(data.oname_user)
@@ -78,41 +79,41 @@ const SettingsUser = ({}) => {
 			const formData = new FormData()
 			formData.append('image', event.target.files[0])
 
-			customAxios.post('http://localhost:8080/upload/user', formData).then(({ data }) => {
-				dispatch(setUserImgUrl(`${data.url}`))
+			await customAxios.post('http://localhost:8080/upload/user', formData).then(({ data }) => {
+				try {
+					dispatch(setUserImgUrl(`${data.url}`))
+					customAxios
+						.patch('/auth/updimg', {
+							img: data.url,
+						})
+						.then(({ data }) => {
+							data && alert('Аватарка была успешно изменена')
+						})
+				} catch (error) {
+					console.log(error)
+					alert('Не удалось обновить аватарку')
+				}
 			})
 		} catch (error) {
 			console.warn(error)
 		}
 	}
 
-	const onClickUpdateImg = async () => {
+	const deleteImg = async () => {
 		try {
-			if (userImgUrl) {
-				const { data } = await customAxios.patch('/auth/updimg', {
-					img: userImgUrl,
-				})
-				data && alert('Аватарка была успешно изменена')
-			}
-		} catch (error) {
-			console.log(error)
-			alert('Не удалось обновить аватарку')
-		}
-	}
-
-	const deleteImg = () => {
-		try {
-			customAxios.delete(`http://localhost:8080/upload/user/delete/${userImgUrl}`)
+			await customAxios.delete(`http://localhost:8080/upload/user/delete/${userImgUrl}`)
 			if (inputFileRef.current) {
 				inputFileRef.current.value = ''
 			}
-			dispatch(setUserImgUrl(''))
+
+			await customAxios.patch('/auth/updimg', {
+				img: '',
+			})
 		} catch (error) {
 			console.log(error)
 		}
+		dispatch(setUserImgUrl(''))
 	}
-
-	console.log('userimg', userImgUrl)
 
 	return (
 		<div className='settings'>
@@ -219,11 +220,6 @@ const SettingsUser = ({}) => {
 						src={`http://localhost:8080/uploads/userIcons/${userImgUrl}`}
 						alt=''
 					/>
-					{userImgUrl && (
-						<button className='button button--footer' onClick={onClickUpdateImg}>
-							Обновить аватарку
-						</button>
-					)}
 				</div>
 			</div>
 			<button

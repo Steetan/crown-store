@@ -35,7 +35,7 @@ export const updateCart = (req, res) => {
         }
         else {
             if (req.body.act === 'plus') {
-                pool.query(`UPDATE carts SET totalcount = totalcount + 1 WHERE user_id=$1 AND product_id=$2`, [decoded.id, req.body.productid], (error, results) => {
+                pool.query(`UPDATE carts SET totalcount = totalcount + 1 WHERE user_id = $1 AND product_id = $2`, [decoded.id, req.body.productid], (error, results) => {
                     if (error)
                         throw error;
                     pool.query('SELECT * FROM carts WHERE user_id = $1', [decoded.id], (error, results) => {

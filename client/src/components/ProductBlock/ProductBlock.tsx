@@ -68,17 +68,20 @@ export const ProductBlock: React.FC<IProductBlock> = ({
 
 	return (
 		<div className='product-block'>
-			<Link to={`product/${id}`} title='посмотреть подробную информацию'>
-				<img
-					className='product-block__image'
-					src={imgurl}
-					alt='Product'
-					onError={(e) => {
-						e.currentTarget.src = require('../../assets/placeholder.jpg')
-					}}
-				/>
-			</Link>
-			<h4 className='product-block__title'>{title}</h4>
+			<div className='product-block__top'>
+				<Link to={`product/${id}`} title='посмотреть подробную информацию'>
+					<div className='product-block__image'>
+						<img
+							src={`http://localhost:8080/uploads/${imgurl}`}
+							alt='Product'
+							// onError={(e) => {
+							// 	e.currentTarget.src = require('../../assets/placeholder.jpg')
+							// }}
+						/>
+					</div>
+				</Link>
+				<h4 className='product-block__title'>{title}</h4>
+			</div>
 			<div className='product-block__bottom'>
 				<div className='product-block__price'>{price} ₽</div>
 				{isAuth && (

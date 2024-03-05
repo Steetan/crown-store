@@ -15,9 +15,11 @@ import {
 	createProduct,
 	deleteFileController,
 	deleteProductById,
+	deleteProducts,
 	getAllProducts,
 	getProductById,
 	getProducts,
+	updateProduct,
 } from './controllers/ProductController.js'
 import {
 	registerProductValidator,
@@ -78,9 +80,11 @@ router.delete('/upload/user/delete/:filename', deleteUserImg)
 router.delete('/upload/auth/delete/:filename', deleteAuthImg)
 
 router.get('/', getProducts)
+router.put('/', updateProduct)
 router.get('/adminpanel', checkAdmin, getAllProducts)
 router.get('/:id', getProductById)
 router.post('/', registerProductValidator, createProduct)
+router.delete('/', checkAdmin, deleteProducts)
 router.delete('/deletebyid', checkAdmin, deleteProductById)
 
 router.post('/cart', checkAuth, pushCart)

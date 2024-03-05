@@ -74,7 +74,7 @@ export const CartItem: React.FC<ICartItem> = ({ id, title, imgurl }) => {
 		<div className='cart__item'>
 			<div className='cart__item-left'>
 				<div className='cart__item-img'>
-					<img src={imgurl} alt='Product' />
+					<img src={`http://localhost:8080/uploads/${imgurl}`} alt='Product' />
 				</div>
 				<div className='cart__item-info'>
 					<h3>{title}</h3>

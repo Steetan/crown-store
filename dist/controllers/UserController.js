@@ -140,11 +140,7 @@ export const getMeInfo = (req, res) => __awaiter(void 0, void 0, void 0, functio
                     if (error)
                         throw error;
                     res.json(results.rows[0]);
-                    console.log('results', results.rows);
                 });
-                // return res.status(200).json({
-                // 	decoded,
-                // })
             }
         });
     }

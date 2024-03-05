@@ -25,5 +25,5 @@ export const registerProductValidator = [
 	body('price', 'Укажите цену').isLength({ min: 1 }),
 	body('category', 'Укажите категорию').isLength({ min: 1 }),
 	body('rating', 'Укажите рейтинг от 1 до 5').isLength({ min: 1, max: 1 }),
-	body('totalcount', 'Укажите количество').isLength({ min: 1 }),
+	// body('totalcount', 'Укажите количество').isLength({ min: 1 }),
 ]

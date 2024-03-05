@@ -13,6 +13,9 @@
 		justify-content: center;
 		display: flex;
 		gap: 20px;
+		@media (max-width: 800px) {
+			flex-direction: column;
+		}
 	}
 
 	&__block {
@@ -52,6 +55,9 @@
 			color: #fff;
 			background-color: red;
 		}
+		&--acc {
+			margin-top: 20px;
+		}
 	}
 
 	&__password {
@@ -67,10 +73,16 @@
 		&-inputs {
 			display: flex;
 			gap: 10px;
+			@media (max-width: 500px) {
+				flex-direction: column;
+			}
 		}
 		&-input:first-child {
 			border-right: 2px solid #555555;
 			padding-right: 15px;
+			@media (max-width: 500px) {
+				border: none;
+			}
 		}
 	}
 	&__btn-password {

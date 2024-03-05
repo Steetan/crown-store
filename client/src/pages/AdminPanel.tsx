@@ -1,38 +1,31 @@
 import React from 'react'
 import { useAppDispatch } from '../redux/store'
 import { fetchAdminMe } from '../redux/slices/authSlice'
-import { useForm } from 'react-hook-form'
-import { TextField } from '@mui/material'
-import { createProduct } from '../redux/slices/productSlice'
 import NotFound from './NotFound'
 import customAxios from '../axios'
+import AdminForm from '../components/AdminForm/AdminForm'
+import AdminFormUpdate from '../components/AdminFormUpdate/AdminFormUpdate'
 
 export interface DataProduct {
 	id?: string
-	title: string
-	description: string
-	fileimg: string
-	price: number
-	rating: number
-	category: number
-	totalcount: number
-	imgurl?: string
+	title: string | undefined
+	description: string | undefined
+	fileimg: string | undefined
+	price: number | undefined
+	rating: number | undefined
+	category: number | undefined
+	totalcount: number | undefined
+	imgurl?: string | undefined
+	avail: boolean | undefined
 }
 
 const AdminPanel: React.FC = () => {
 	const [hasError, setHasError] = React.useState(false)
-	const [imgUrl, setImgUrl] = React.useState('')
-	const inputFileRef = React.useRef<HTMLInputElement>(null)
 	const [fetchData, setFetchData] = React.useState<DataProduct[]>([])
 	const [isVisiblePopupUpdate, setIsVisiblePopupUpdate] = React.useState(false)
+	const [selectedProductData, setSelectedProductData] = React.useState<any>({})
 
 	const dispatch = useAppDispatch()
-
-	const {
-		register,
-		handleSubmit,
-		formState: { errors },
-	} = useForm<DataProduct>()
 
 	React.useEffect(() => {
 		try {
@@ -66,32 +59,7 @@ const AdminPanel: React.FC = () => {
 		return <div className='loading-cart'></div>
 	}
 
-	const handleFileChange = async (event: any) => {
-		try {
-			const formData = new FormData()
-			formData.append('image', event.target.files[0])
-
-			customAxios.post('http://localhost:8080/upload', formData).then(({ data }) => {
-				setImgUrl(data.url)
-			})
-		} catch (error) {
-			console.warn(error)
-		}
-	}
-
-	const deleteImg = () => {
-		try {
-			customAxios.delete(`http://localhost:8080/upload/delete/${imgUrl}`)
-			if (inputFileRef.current) {
-				inputFileRef.current.value = ''
-				setImgUrl('')
-			}
-		} catch (error) {
-			console.log(error)
-		}
-	}
-
-	const deleteItem = (id: string, title: string) => {
+	const deleteItem = (id: string, title: string | undefined) => {
 		try {
 			if (window.confirm(`Вы действительно хотите удалить продукт ${title}?`)) {
 				customAxios
@@ -111,224 +79,104 @@ const AdminPanel: React.FC = () => {
 		}
 	}
 
-	const onSubmit = async (values: DataProduct) => {
-		const data = await dispatch(createProduct({ ...values, fileimg: imgUrl }))
-		if (!data.payload) {
-			return alert('Не удалось создать продукт!')
-		}
-		if (data.payload) {
-			window.location.reload()
+	const deleteProducts = () => {
+		try {
+			if (window.confirm(`Вы действительно хотите удалить все продукты?`)) {
+				customAxios.delete(`http://localhost:8080/`).then(() => {
+					customAxios.get(`http://localhost:8080/adminpanel`).then(({ data }) => {
+						setFetchData(data)
+					})
+				})
+			}
+		} catch (error) {
+			console.log(error)
 		}
 	}
 
+	const onOpenPopup = (item: DataProduct) => {
+		setIsVisiblePopupUpdate(true)
+		document.body.classList.add('active')
+		setSelectedProductData(item)
+		window.scrollTo(0, 0)
+	}
+
+	const onClosePopup = () => {
+		setIsVisiblePopupUpdate(false)
+		document.body.classList.remove('active')
+	}
+
 	return (
-		<div>
-			<div className='form-block'>
-				<h3 className='form-block__title'>Добавить продукт</h3>
-				<form onSubmit={handleSubmit(onSubmit)}>
-					<div className='form-block__inputs'>
-						<TextField
-							id='outlined-basic'
-							className='form-block__input'
-							label='Название'
-							variant='outlined'
-							{...register('title', { required: 'Укажите название' })}
-						/>
-						{errors.title && <p style={{ color: 'red' }}>{errors.title.message}</p>}
-						<TextField
-							id='outlined-basic'
-							label='Описание'
-							className='form-block__input'
-							variant='outlined'
-							{...register('description', { required: 'Укажите описание' })}
-						/>
-						{errors.description && <p style={{ color: 'red' }}>{errors.description.message}</p>}
-						<TextField
-							id='outlined-basic'
-							label='Цена'
-							className='form-block__input'
-							variant='outlined'
-							{...register('price', { required: 'Укажите цену' })}
-						/>
-						{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
-						<TextField
-							id='outlined-basic'
-							label='Категория'
-							className='form-block__input'
-							variant='outlined'
-							{...register('category', { required: 'Укажите категорию' })}
-						/>
-						{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
-						<TextField
-							id='outlined-basic'
-							label='Рейтинг от 1 до 5'
-							className='form-block__input'
-							variant='outlined'
-							{...register('rating', { required: 'Укажите цену' })}
-						/>
-						{errors.rating && <p style={{ color: 'red' }}>{errors.rating.message}</p>}
-						<TextField
-							id='outlined-basic'
-							label='Количество'
-							className='form-block__input'
-							variant='outlined'
-							{...register('totalcount', { required: 'Укажите цену' })}
-						/>
-						{errors.totalcount && <p style={{ color: 'red' }}>{errors.totalcount.message}</p>}
-						{!imgUrl && (
-							<label htmlFor='file-upload' className='custom-file-upload'>
-								Загрузить фото
-							</label>
-						)}
-						<input
-							id='file-upload'
-							ref={inputFileRef}
-							type='file'
-							style={{ display: 'none' }}
-							onChange={handleFileChange}
-						/>
-					</div>
-					{imgUrl && (
-						<div className='custom-block-img'>
-							<img
-								className='form-block__img-upload'
-								src={`http://localhost:8080/uploads/${imgUrl}`}
-								alt=''
-							/>
-							{imgUrl && (
-								<button className='settings__btn-delete' onClick={deleteImg}>
-									Удалить
-								</button>
-							)}
-						</div>
-					)}
-					<div className='form-block__btns'>
-						<button type='submit' className='button button--footer'>
-							Добавить продукт
-						</button>
-					</div>
-				</form>
+		<div className='admin-block'>
+			<div className='form-block form-block--admin'>
+				<h3 className='form-block__title'>Добавить</h3>
+				<AdminForm nameButton='Добавить продукт' />
 			</div>
-			<div className='admin__list-block'>
-				<div className='admin__list-item'>
-					<div className='admin__list-cell admin__list-cell--title'>id</div>
-					<div className='admin__list-cell admin__list-cell--title'>title</div>
-					<div className='admin__list-cell admin__list-cell--title'>description</div>
-					<div className='admin__list-cell admin__list-cell--title'>price</div>
-					<div className='admin__list-cell admin__list-cell--title'>category</div>
-					<div className='admin__list-cell admin__list-cell--title'>imgurl</div>
-					<div className='admin__list-cell admin__list-cell--title'>rating</div>
-					<div className='admin__list-cell admin__list-cell--title'>totalcount</div>
+			<div className='admin__list-main-block'>
+				<div className='admin__list-header'>
+					<h3 className='admin__list-title'>Продукты</h3>
+					<h4 className='admin__list-deleteAll' onClick={deleteProducts}>
+						Удалить все
+					</h4>
 				</div>
-				{!hasError &&
-					fetchData.map((item: DataProduct) => (
-						<>
-							<div className='admin__list-item'>
-								<div className='admin__list-cell'>{item.id}</div>
-								<div className='admin__list-cell'>{item.title}</div>
-								<div className='admin__list-cell'>{item.description}</div>
-								<div className='admin__list-cell'>{item.price}</div>
-								<div className='admin__list-cell'>{item.category}</div>
-								<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'null'}</div>
-								<div className='admin__list-cell'>{item.rating}</div>
-								<div className='admin__list-cell'>{item.totalcount}</div>
-								<div
-									className='admin__list-cell-delete'
-									onClick={() => deleteItem(item.id ? item.id : '', item.title)}
-								>
-									x
-								</div>
-								<div
-									className='admin__list-cell-delete'
-									onClick={() => setIsVisiblePopupUpdate(true)}
-								>
-									u
+				<div className='admin__list-block'>
+					<div className='admin__list-item'>
+						<div className='admin__list-cell admin__list-cell--title'>id</div>
+						<div className='admin__list-cell admin__list-cell--title'>title</div>
+						<div className='admin__list-cell admin__list-cell--title'>description</div>
+						<div className='admin__list-cell admin__list-cell--title'>price</div>
+						<div className='admin__list-cell admin__list-cell--title'>category</div>
+						<div className='admin__list-cell admin__list-cell--title'>imgurl</div>
+						<div className='admin__list-cell admin__list-cell--title'>rating</div>
+						<div className='admin__list-cell admin__list-cell--title'>avail</div>
+					</div>
+					{!hasError &&
+						fetchData.map((item: DataProduct) => (
+							<div key={item.id}>
+								<div className='admin__list-item'>
+									<div className='admin__list-cell'>{item.id}</div>
+									<div className='admin__list-cell'>{item.title}</div>
+									<div className='admin__list-cell'>{item.description}</div>
+									<div className='admin__list-cell'>{item.price}</div>
+									<div className='admin__list-cell'>{item.category}</div>
+									<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'false'}</div>
+									<div className='admin__list-cell'>{item.rating}</div>
+									<div className='admin__list-cell'>{String(item.avail)}</div>
+									<div className='admin__list-cell-act'>
+										<img
+											onClick={() => onOpenPopup(item)}
+											className='admin__list-cell-update'
+											src={require('../assets/system-update.png')}
+											alt='update'
+											title='обновить строку'
+										/>
+										<img
+											className='admin__list-cell-delete'
+											onClick={() => deleteItem(item.id ? item.id : '', item.title)}
+											src={require('../assets/delete.png')}
+											title='удалить строку'
+										/>
+									</div>
 								</div>
 							</div>
-						</>
-					))}
-			</div>
-			{/* {isVisiblePopupUpdate && (
-				<div className='popup-update'>
-					<h3 className='form-block__title'>Изменить продукт</h3>
-					<form onSubmit={handleSubmit(onSubmit)}>
-						<div className='form-block__inputs'>
-							<TextField
-								id='outlined-basic'
-								className='form-block__input'
-								label='Название'
-								variant='outlined'
-								{...register('title', { required: 'Укажите название' })}
-							/>
-							{errors.title && <p style={{ color: 'red' }}>{errors.title.message}</p>}
-							<TextField
-								id='outlined-basic'
-								label='Описание'
-								className='form-block__input'
-								variant='outlined'
-								{...register('description', { required: 'Укажите описание' })}
-							/>
-							{errors.description && <p style={{ color: 'red' }}>{errors.description.message}</p>}
-							<TextField
-								id='outlined-basic'
-								label='Цена'
-								className='form-block__input'
-								variant='outlined'
-								{...register('price', { required: 'Укажите цену' })}
-							/>
-							{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
-							<TextField
-								id='outlined-basic'
-								label='Категория'
-								className='form-block__input'
-								variant='outlined'
-								{...register('category', { required: 'Укажите категорию' })}
-							/>
-							{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
-							<TextField
-								id='outlined-basic'
-								label='Рейтинг от 1 до 5'
-								className='form-block__input'
-								variant='outlined'
-								{...register('rating', { required: 'Укажите цену' })}
-							/>
-							{errors.rating && <p style={{ color: 'red' }}>{errors.rating.message}</p>}
-							<TextField
-								id='outlined-basic'
-								label='Количество'
-								className='form-block__input'
-								variant='outlined'
-								{...register('totalcount', { required: 'Укажите цену' })}
-							/>
-							{errors.totalcount && <p style={{ color: 'red' }}>{errors.totalcount.message}</p>}
-							{!imgUrl && (
-								<label htmlFor='file-upload' className='custom-file-upload'>
-									Выберите файл
-								</label>
-							)}
-							<input
-								id='file-upload'
-								ref={inputFileRef}
-								type='file'
-								style={{ display: 'none' }}
-								onChange={handleFileChange}
-							/>
-							{errors.fileimg && <p style={{ color: 'red' }}>{errors.fileimg.message}</p>}
-						</div>
-						<img
-							className='form-block__img-upload'
-							src={`http://localhost:8080/uploads/${imgUrl}`}
-							alt=''
-						/>
-						{imgUrl && <button onClick={deleteImg}>del</button>}
-						<div className='form-block__btns'>
-							<button type='submit' className='button button--footer'>
-								Изменить
-							</button>
-						</div>
-					</form>
+						))}
 				</div>
-			)} */}
+				{isVisiblePopupUpdate && (
+					<div className='popup-update__wrapper'>
+						<div className='popup-update'>
+							<h3 className='form-block__title'>Обновить продукт</h3>
+							<div className='popup-update__close-wrap' onClick={onClosePopup}>
+								<div className='popup-update__close'></div>
+							</div>
+							<AdminFormUpdate
+								nameButton='Обновить'
+								productData={selectedProductData}
+								setFetchData={setFetchData}
+								setIsVisiblePopupUpdate={setIsVisiblePopupUpdate}
+							/>
+						</div>
+					</div>
+				)}
+			</div>
 		</div>
 	)
 }
