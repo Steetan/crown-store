@@ -2,8 +2,6 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { DataProduct } from '../../pages/AdminPanel'
 import { TextField } from '@mui/material'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
 import { updateProduct } from '../../redux/slices/productSlice'
 import customAxios from '../../axios'
 import { useAppDispatch } from '../../redux/store'
@@ -22,7 +20,6 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 	setIsVisiblePopupUpdate,
 }) => {
 	const [imgUrlUpdate, setImgUrlUpdate] = React.useState('')
-	const [checkAvail, setCheckAvail] = React.useState(false)
 	const inputFileRef = React.useRef<HTMLInputElement>(null)
 	const dispatch = useAppDispatch()
 
@@ -36,9 +33,8 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 	const onSubmit = async (values: DataProduct) => {
 		try {
 			const data = await dispatch(
-				updateProduct({ ...values, fileimg: imgUrlUpdate, avail: checkAvail, id: productData?.id }),
+				updateProduct({ ...values, fileimg: imgUrlUpdate, id: productData?.id }),
 			)
-			console.log('aye', { ...values, fileimg: imgUrlUpdate, avail: checkAvail })
 			if (!data.payload) {
 				return alert('Не удалось обновить продукт!')
 			}
@@ -85,13 +81,12 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 	}
 
 	React.useEffect(() => {
-		console.log('productData', productData?.avail)
 		setValue('title', productData?.title)
 		setValue('description', productData?.description)
 		setValue('price', productData?.price)
 		setValue('category', productData?.category)
 		setValue('rating', productData?.rating)
-		setCheckAvail(productData?.avail ? productData?.avail : false)
+		setValue('count', productData?.count)
 		setImgUrlUpdate(productData?.imgurl ? productData.imgurl : '')
 	}, [productData, setValue])
 
@@ -138,13 +133,14 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 					{...register('rating', { required: 'Укажите цену' })}
 				/>
 				{errors.rating && <p style={{ color: 'red' }}>{errors.rating.message}</p>}
-				<FormControlLabel
-					control={<Checkbox />}
-					label='isAvail'
-					{...register('avail')}
-					onChange={() => setCheckAvail(!checkAvail)}
-					checked={checkAvail}
+				<TextField
+					id='outlined-basic'
+					label='Количество'
+					className='form-block__input'
+					variant='outlined'
+					{...register('count', { required: 'Укажите количество' })}
 				/>
+				{errors.count && <p style={{ color: 'red' }}>{errors.count.message}</p>}
 				{!imgUrlUpdate && (
 					<label htmlFor='file-upload-update' className='custom-file-upload'>
 						Загрузить фото

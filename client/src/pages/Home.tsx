@@ -17,11 +17,13 @@ import {
 } from '../components'
 import { getCart, setCountProduct, setTotalCount, setTotalPrice } from '../redux/slices/cartSlice'
 
-interface IProductBlock {
+export interface IProductBlock {
 	id: string
 	title: string
 	imgurl: string
 	price: number
+	count: number
+	countProduct?: { product: string; count: number }[]
 }
 
 const Home = () => {
@@ -83,7 +85,7 @@ const Home = () => {
 
 	React.useEffect(() => {
 		getProductsCart()
-	}, [])
+	}, [nameCategory])
 
 	const getProducts = async () => {
 		const categoryParam: string = `${`categoryid=${categoryId}`}`
@@ -184,7 +186,12 @@ const Home = () => {
 					{status === 'loading'
 						? [...new Array(6)].map((_, index) => <ProductBlockSkeleton key={index} />)
 						: items.map((item: IProductBlock) => (
-								<ProductBlock key={item.id} {...item} countProduct={countProduct} />
+								<ProductBlock
+									key={item.id}
+									{...item}
+									countProduct={countProduct}
+									count={item?.count}
+								/>
 						  ))}
 				</div>
 			)}

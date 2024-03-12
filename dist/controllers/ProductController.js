@@ -24,11 +24,11 @@ export const getProducts = (req, res) => {
             parseSelectedRating = '';
             break;
     }
-    let queryString = `SELECT * FROM product ${!search && category ? `WHERE avail = TRUE AND category=${category}` : ''} ${search ? `WHERE avail = TRUE AND title ILIKE ${"'%" + search + "%'"} ` : ''}`;
+    let queryString = `SELECT * FROM product ${!search && category ? `WHERE count > 0 AND category=${category}` : ''} ${search ? `WHERE count > 0 AND title ILIKE ${"'%" + search + "%'"} ` : ''}`;
     if (!category && !search) {
         queryString += toRange
-            ? `WHERE avail = TRUE AND price >= ${fromRange} AND price <= ${toRange} `
-            : `WHERE avail = TRUE AND price >= ${fromRange} `;
+            ? `WHERE count > 0 AND price >= ${fromRange} AND price <= ${toRange} `
+            : `WHERE count > 0 AND price >= ${fromRange} `;
         queryString += parseSelectedRating !== '' ? `AND ${parseSelectedRating} ` : '';
     }
     if (category || search) {
@@ -61,14 +61,14 @@ export const getProductById = (req, res) => {
 };
 export const updateProduct = (req, res) => {
     console.log('updateProduct', req.body);
-    pool.query('UPDATE product SET title = $1, description = $2, price = $3, category = $4, imgurl = $5, rating = $6, avail = $7 WHERE id = $8', [
+    pool.query('UPDATE product SET title = $1, description = $2, price = $3, category = $4, imgurl = $5, rating = $6, count = $7 WHERE id = $8', [
         req.body.title,
         req.body.description,
         req.body.price,
         req.body.category,
         req.body.fileimg,
         req.body.rating,
-        req.body.avail,
+        req.body.count,
         req.body.id,
     ], (error, results) => {
         if (error)
@@ -82,7 +82,7 @@ export const createProduct = (req, res) => {
         if (!errors.isEmpty()) {
             return res.status(400).json(errors.array());
         }
-        pool.query('INSERT INTO product (id, title, description, price, category, imgurl, rating, avail) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [
+        pool.query('INSERT INTO product (id, title, description, price, category, imgurl, rating, count) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)', [
             uuidv4(),
             req.body.title,
             req.body.description,
@@ -90,7 +90,7 @@ export const createProduct = (req, res) => {
             req.body.category,
             req.body.fileimg,
             req.body.rating,
-            req.body.avail,
+            req.body.count,
         ], (error, results) => {
             if (error)
                 throw error;

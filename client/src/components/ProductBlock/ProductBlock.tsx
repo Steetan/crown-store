@@ -5,14 +5,7 @@ import { Link } from 'react-router-dom'
 import { RootState, useAppDispatch } from '../../redux/store'
 import customAxios from '../../axios'
 import { selectIsAuth } from '../../redux/slices/authSlice'
-
-interface IProductBlock {
-	id: string
-	title: string
-	imgurl: string
-	price: number
-	countProduct?: { product: string; count: number }[]
-}
+import { IProductBlock } from '../../pages/Home'
 
 export const ProductBlock: React.FC<IProductBlock> = ({
 	id,
@@ -20,8 +13,10 @@ export const ProductBlock: React.FC<IProductBlock> = ({
 	imgurl,
 	price,
 	countProduct,
+	count,
 }) => {
 	const { totalCount, totalPrice } = useSelector((state: RootState) => state.cartSlice)
+	const { nameCategory } = useSelector((state: RootState) => state.filterSlice)
 	const dispatch = useAppDispatch()
 	const [targetProduct, setTargetProduct] = React.useState<{ product: string; count: number }>({
 		product: '',
@@ -33,7 +28,7 @@ export const ProductBlock: React.FC<IProductBlock> = ({
 	React.useEffect(() => {
 		const target = countProduct?.find((product) => product.product === id)
 		setTargetProduct(target ?? { product: 'id', count: 0 })
-	}, [countProduct])
+	}, [countProduct, nameCategory])
 
 	const onClickAdd = async () => {
 		customAxios
@@ -67,30 +62,32 @@ export const ProductBlock: React.FC<IProductBlock> = ({
 	}
 
 	return (
-		<div className='product-block'>
-			<div className='product-block__top'>
-				<Link to={`product/${id}`} title='посмотреть подробную информацию'>
-					<div className='product-block__image'>
-						<img
-							src={`http://localhost:8080/uploads/${imgurl}`}
-							alt='Product'
-							// onError={(e) => {
-							// 	e.currentTarget.src = require('../../assets/placeholder.jpg')
-							// }}
-						/>
-					</div>
-				</Link>
-				<h4 className='product-block__title'>{title}</h4>
+		count && (
+			<div className='product-block'>
+				<div className='product-block__top'>
+					<Link to={`product/${id}`} title='посмотреть подробную информацию'>
+						<div className='product-block__image'>
+							<img
+								src={`http://localhost:8080/uploads/${imgurl}`}
+								alt='Product'
+								onError={(e) => {
+									e.currentTarget.src = require('../../assets/placeholder.jpg')
+								}}
+							/>
+						</div>
+					</Link>
+					<h4 className='product-block__title'>{title}</h4>
+				</div>
+				<div className='product-block__bottom'>
+					<div className='product-block__price'>{price} ₽</div>
+					{isAuth && (
+						<button onClick={() => onClickAdd()} className='button button--outline button--add'>
+							<span>Добавить</span>
+							{targetProduct.count !== 0 && <i>{targetProduct.count}</i>}
+						</button>
+					)}
+				</div>
 			</div>
-			<div className='product-block__bottom'>
-				<div className='product-block__price'>{price} ₽</div>
-				{isAuth && (
-					<button onClick={() => onClickAdd()} className='button button--outline button--add'>
-						<span>Добавить</span>
-						{targetProduct.count !== 0 && <i>{targetProduct.count}</i>}
-					</button>
-				)}
-			</div>
-		</div>
+		)
 	)
 }

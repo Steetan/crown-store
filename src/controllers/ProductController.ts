@@ -31,13 +31,13 @@ export const getProducts = (req: Request, res: Response) => {
 	}
 
 	let queryString = `SELECT * FROM product ${
-		!search && category ? `WHERE avail = TRUE AND category=${category}` : ''
-	} ${search ? `WHERE avail = TRUE AND title ILIKE ${"'%" + search + "%'"} ` : ''}`
+		!search && category ? `WHERE count > 0 AND category=${category}` : ''
+	} ${search ? `WHERE count > 0 AND title ILIKE ${"'%" + search + "%'"} ` : ''}`
 
 	if (!category && !search) {
 		queryString += toRange
-			? `WHERE avail = TRUE AND price >= ${fromRange} AND price <= ${toRange} `
-			: `WHERE avail = TRUE AND price >= ${fromRange} `
+			? `WHERE count > 0 AND price >= ${fromRange} AND price <= ${toRange} `
+			: `WHERE count > 0 AND price >= ${fromRange} `
 
 		queryString += parseSelectedRating !== '' ? `AND ${parseSelectedRating} ` : ''
 	}
@@ -83,7 +83,7 @@ export const getProductById = (req: Request, res: Response) => {
 export const updateProduct = (req: Request, res: Response) => {
 	console.log('updateProduct', req.body)
 	pool.query(
-		'UPDATE product SET title = $1, description = $2, price = $3, category = $4, imgurl = $5, rating = $6, avail = $7 WHERE id = $8',
+		'UPDATE product SET title = $1, description = $2, price = $3, category = $4, imgurl = $5, rating = $6, count = $7 WHERE id = $8',
 		[
 			req.body.title,
 			req.body.description,
@@ -91,7 +91,7 @@ export const updateProduct = (req: Request, res: Response) => {
 			req.body.category,
 			req.body.fileimg,
 			req.body.rating,
-			req.body.avail,
+			req.body.count,
 			req.body.id,
 		],
 		(error: Error, results: QueryResult) => {
@@ -109,7 +109,7 @@ export const createProduct = (req: Request, res: Response) => {
 		}
 
 		pool.query(
-			'INSERT INTO product (id, title, description, price, category, imgurl, rating, avail) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+			'INSERT INTO product (id, title, description, price, category, imgurl, rating, count) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
 			[
 				uuidv4(),
 				req.body.title,
@@ -118,7 +118,7 @@ export const createProduct = (req: Request, res: Response) => {
 				req.body.category,
 				req.body.fileimg,
 				req.body.rating,
-				req.body.avail,
+				req.body.count,
 			],
 			(error: Error, results: QueryResult) => {
 				if (error) throw error

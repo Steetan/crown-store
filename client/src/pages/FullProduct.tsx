@@ -54,13 +54,7 @@ const FullProduct: React.FC = () => {
 	return (
 		<div className='container container--fullProduct'>
 			<div className='product-block__image'>
-				<img
-					src={`http://localhost:8080/uploads/${dataProduct.imgurl}`}
-					alt='Product'
-					// onError={(e) => {
-					// 	e.currentTarget.src = require('../../assets/placeholder.jpg')
-					// }}
-				/>
+				<img src={`http://localhost:8080/uploads/${dataProduct.imgurl}`} alt='Product' />
 			</div>
 			<h2 className='product-block__title--fullProduct'>{dataProduct.title}</h2>
 			<p className='product-block__desc'>{dataProduct.description}</p>

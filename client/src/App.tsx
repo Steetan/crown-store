@@ -13,6 +13,7 @@ import { useAppDispatch } from './redux/store'
 import { fetchUserMe } from './redux/slices/authSlice'
 import AdminPanel from './pages/AdminPanel'
 import SettingsUser from './components/SettingsUser/SettingsUser'
+import ResultBuy from './pages/ResultBuy'
 const Cart = React.lazy(() => import('./pages/Cart'))
 
 function App() {
@@ -39,6 +40,7 @@ function App() {
 				<Route path='auth/reg' element={<Registration />} />
 				<Route path='settings' element={<SettingsUser />} />
 				<Route path='product/:id' element={<FullProduct />} />
+				<Route path='resultbuy' element={<ResultBuy />} />
 				<Route path='*' element={<NotFound />} />
 				<Route
 					path='cart'

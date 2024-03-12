@@ -14,9 +14,8 @@ export interface DataProduct {
 	price: number | undefined
 	rating: number | undefined
 	category: number | undefined
-	totalcount: number | undefined
+	count: number | undefined
 	imgurl?: string | undefined
-	avail: boolean | undefined
 }
 
 const AdminPanel: React.FC = () => {
@@ -127,7 +126,7 @@ const AdminPanel: React.FC = () => {
 						<div className='admin__list-cell admin__list-cell--title'>category</div>
 						<div className='admin__list-cell admin__list-cell--title'>imgurl</div>
 						<div className='admin__list-cell admin__list-cell--title'>rating</div>
-						<div className='admin__list-cell admin__list-cell--title'>avail</div>
+						<div className='admin__list-cell admin__list-cell--title'>count</div>
 					</div>
 					{!hasError &&
 						fetchData.map((item: DataProduct) => (
@@ -140,7 +139,7 @@ const AdminPanel: React.FC = () => {
 									<div className='admin__list-cell'>{item.category}</div>
 									<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'false'}</div>
 									<div className='admin__list-cell'>{item.rating}</div>
-									<div className='admin__list-cell'>{String(item.avail)}</div>
+									<div className='admin__list-cell'>{item.count}</div>
 									<div className='admin__list-cell-act'>
 										<img
 											onClick={() => onOpenPopup(item)}

@@ -6,7 +6,7 @@ export const ProductBlockSkeleton = () => (
 	<ContentLoader
 		className='product-block product-block--skeleton'
 		speed={2}
-		width={280}
+		width={260}
 		height={425}
 		viewBox='0 0 280 425'
 		backgroundColor='#f3f3f3'

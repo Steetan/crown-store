@@ -2,8 +2,6 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 import { DataProduct } from '../../pages/AdminPanel'
 import { TextField } from '@mui/material'
-import FormControlLabel from '@mui/material/FormControlLabel'
-import Checkbox from '@mui/material/Checkbox'
 import { createProduct } from '../../redux/slices/productSlice'
 import customAxios from '../../axios'
 import { useAppDispatch } from '../../redux/store'
@@ -30,7 +28,6 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 	}
 
 	const handleFileChange = async (event: any) => {
-		console.log('ttt')
 		try {
 			const formData = new FormData()
 			formData.append('image', event.target.files[0])
@@ -39,7 +36,7 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 				setImgUrl(data.url)
 			})
 		} catch (error) {
-			console.warn(error)
+			console.log(error)
 		}
 	}
 
@@ -98,11 +95,14 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 					{...register('rating', { required: 'Укажите цену' })}
 				/>
 				{errors.rating && <p style={{ color: 'red' }}>{errors.rating.message}</p>}
-				<FormControlLabel
-					control={<Checkbox defaultChecked />}
-					label='isAvail'
-					{...register('avail')}
+				<TextField
+					id='outlined-basic'
+					label='Количество'
+					className='form-block__input'
+					variant='outlined'
+					{...register('count', { required: 'Укажите количество' })}
 				/>
+				{errors.count && <p style={{ color: 'red' }}>{errors.count.message}</p>}
 				{!imgUrl && (
 					<label htmlFor='file-upload-create' className='custom-file-upload'>
 						Загрузить фото
