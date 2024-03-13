@@ -9,6 +9,7 @@ const SettingsUser = ({}) => {
 	const [userDataName, setUserDataName] = React.useState('')
 	const [userDataFname, setUserDataFname] = React.useState('')
 	const [userDataOname, setUserDataOname] = React.useState('')
+	const [userDataEmail, setUserDataEmail] = React.useState('')
 
 	const inputFileRef = React.useRef<HTMLInputElement>(null)
 
@@ -24,10 +25,10 @@ const SettingsUser = ({}) => {
 		const fetchMe = async () => {
 			const { data } = await customAxios.get('auth/meinfo')
 
-			console.log(data)
 			setUserDataName(data.name_user)
 			setUserDataFname(data.fname_user)
 			setUserDataOname(data.oname_user)
+			setUserDataEmail(data.email)
 		}
 		fetchMe()
 	}, [])
@@ -50,9 +51,13 @@ const SettingsUser = ({}) => {
 					name: userDataName,
 					fname: userDataFname,
 					oname: userDataOname,
+					email: userDataEmail,
 				})
 
 				alert(data.message)
+				localStorage.removeItem('token')
+				navigate('/')
+				window.location.reload()
 			}
 		} catch (error) {
 			console.log(error)
@@ -145,6 +150,15 @@ const SettingsUser = ({}) => {
 							value={userDataOname}
 							onChange={(e) => setUserDataOname(e.target.value)}
 						/>
+						{!userDataOname && <p style={{ color: 'red', marginBottom: 10 }}>Введите отчество</p>}
+						<h4 className='settings__label'>Email</h4>
+						<input
+							className='settings__input'
+							type='text'
+							value={userDataEmail}
+							onChange={(e) => setUserDataEmail(e.target.value)}
+						/>
+						{!userDataOname && <p style={{ color: 'red', marginBottom: 10 }}>Введите email</p>}
 						<button type='submit' className='button button--footer' onClick={onSubmit}>
 							Обновить
 						</button>

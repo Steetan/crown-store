@@ -4,7 +4,7 @@ import { Search } from '../Search/Search'
 import { useSelector } from 'react-redux'
 import { selectCart } from '../../redux/slices/cartSlice'
 import { setSearchInput } from '../../redux/slices/filterSlice'
-import { selectIsAuth } from '../../redux/slices/authSlice'
+import { fetchAdminMe, selectIsAuth, setIsAdmin } from '../../redux/slices/authSlice'
 import PopupMenu from '../PopupMenu/PopupMenu'
 import { RootState, useAppDispatch } from '../../redux/store'
 
@@ -12,7 +12,7 @@ export const Header: React.FC = () => {
 	const isAuth = useSelector(selectIsAuth)
 	const { totalPrice } = useSelector(selectCart)
 	const { totalCount } = useSelector((state: RootState) => state.cartSlice)
-	const { userImgUrl } = useSelector((state: RootState) => state.authSlice)
+	const { isAdmin } = useSelector((state: RootState) => state.authSlice)
 	const location = useLocation()
 	const dispatch = useAppDispatch()
 
@@ -22,7 +22,22 @@ export const Header: React.FC = () => {
 		location.pathname === '/settings' ||
 		location.pathname === '/adminpanel'
 
-	console.log(userImgUrl)
+	React.useEffect(() => {
+		try {
+			const fetchMe = async () => {
+				const data = await dispatch(fetchAdminMe())
+
+				if (data.payload.error) {
+					dispatch(setIsAdmin(false))
+				} else {
+					dispatch(setIsAdmin(true))
+				}
+			}
+			fetchMe()
+		} catch (error) {
+			console.log(error)
+		}
+	}, [dispatch])
 
 	return (
 		<div className='header'>
@@ -40,6 +55,12 @@ export const Header: React.FC = () => {
 					{!isAuth && !isLoginPage && (
 						<Link to='/auth/login' className='button button--cart'>
 							Войти
+						</Link>
+					)}
+
+					{isAdmin && !isLoginPage && (
+						<Link to='/adminpanel' className=''>
+							<img style={{ width: 50 }} src={require('../../assets/adminIcon.png')} alt='admin' />
 						</Link>
 					)}
 

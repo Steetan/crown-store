@@ -39,6 +39,7 @@ import {
 	pushCart,
 	updateCart,
 } from './controllers/CartController.js'
+import { postEmail } from './controllers/EmailController.js'
 
 const router = Router()
 
@@ -104,5 +105,7 @@ router.get('/auth/meinfo', checkAuth, getMeInfo)
 router.post('/auth/reg', registerValidator, createUser)
 router.post('/auth/login', registerValidator, loginUser)
 router.delete('/auth/delete', checkAuth, deleteMe)
+
+router.post('/email', checkAuth, postEmail)
 
 export default router

@@ -16,6 +16,7 @@ import {
 	listTypeSort,
 } from '../components'
 import { getCart, setCountProduct, setTotalCount, setTotalPrice } from '../redux/slices/cartSlice'
+import { fetchAdminMe, setIsAdmin } from '../redux/slices/authSlice'
 
 export interface IProductBlock {
 	id: string
@@ -65,6 +66,21 @@ const Home = () => {
 		}
 
 		isSearch.current = false
+
+		try {
+			const fetchMe = async () => {
+				const data = await dispatch(fetchAdminMe())
+
+				if (data.payload.error) {
+					dispatch(setIsAdmin(false))
+				} else {
+					dispatch(setIsAdmin(true))
+				}
+			}
+			fetchMe()
+		} catch (error) {
+			console.log(error)
+		}
 	}, [])
 
 	const getProductsCart = () => {

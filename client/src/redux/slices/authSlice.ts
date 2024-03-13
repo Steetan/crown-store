@@ -49,12 +49,14 @@ type TypeAuthState = {
 	data: any
 	status: string
 	userImgUrl: string
+	isAdmin: boolean
 }
 
 const initialState: TypeAuthState = {
 	data: null,
 	status: Status.LOADING,
 	userImgUrl: '',
+	isAdmin: false,
 }
 
 const authSlice = createSlice({
@@ -66,6 +68,9 @@ const authSlice = createSlice({
 		},
 		setUserImgUrl: (state, action) => {
 			state.userImgUrl = action.payload
+		},
+		setIsAdmin: (state, action) => {
+			state.isAdmin = action.payload
 		},
 	},
 	extraReducers: (builder) => {
@@ -117,4 +122,4 @@ export const selectIsAuthAdmin = (state: RootState) => Boolean(state.authSlice.d
 
 export default authSlice.reducer
 
-export const { logout, setUserImgUrl } = authSlice.actions
+export const { logout, setUserImgUrl, setIsAdmin } = authSlice.actions

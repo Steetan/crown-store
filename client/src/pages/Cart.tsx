@@ -49,6 +49,7 @@ const Card: React.FC = () => {
 	}
 
 	const cleanCartBuy = async () => {
+		await customAxios.post('/email')
 		await customAxios.delete('/cart/delete')
 		await getProductsCart()
 	}

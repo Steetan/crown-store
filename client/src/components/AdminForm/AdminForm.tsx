@@ -1,13 +1,15 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { DataProduct } from '../../pages/AdminPanel'
-import { TextField } from '@mui/material'
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import { createProduct } from '../../redux/slices/productSlice'
 import customAxios from '../../axios'
 import { useAppDispatch } from '../../redux/store'
+import { arrCategories } from '../Categories/Categories'
 
 const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = ({ nameButton }) => {
 	const [imgUrl, setImgUrl] = React.useState('')
+	const [category, setCategory] = React.useState('')
 	const inputFileRef = React.useRef<HTMLInputElement>(null)
 	const dispatch = useAppDispatch()
 
@@ -79,14 +81,26 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 					{...register('price', { required: 'Укажите цену' })}
 				/>
 				{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
-				<TextField
-					id='outlined-basic'
-					label='Категория'
-					className='form-block__input'
-					variant='outlined'
-					{...register('category', { required: 'Укажите категорию' })}
-				/>
-				{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
+				<FormControl fullWidth>
+					<InputLabel id='demo-simple-select-label'>Категория</InputLabel>
+					<Select
+						labelId='demo-simple-select-label'
+						id='demo-simple-select'
+						value={category}
+						label='Категория'
+						{...register('category', {
+							required: 'Укажите категорию',
+							onChange: (event) => setCategory(event.target.value),
+						})}
+					>
+						{arrCategories.slice(1).map((item, index) => (
+							<MenuItem key={index + 1} value={index + 1}>
+								{item}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
+				{errors.category && <p style={{ color: 'red' }}>{errors.category.message}</p>}
 				<TextField
 					id='outlined-basic'
 					label='Рейтинг от 1 до 5'

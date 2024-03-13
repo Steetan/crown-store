@@ -1,6 +1,6 @@
 import React from 'react'
 import { RootState, useAppDispatch } from '../../redux/store'
-import { logout, setUserImgUrl } from '../../redux/slices/authSlice'
+import { logout, setIsAdmin, setUserImgUrl } from '../../redux/slices/authSlice'
 import { useNavigate } from 'react-router-dom'
 import customAxios from '../../axios'
 import { useSelector } from 'react-redux'
@@ -61,6 +61,7 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 
 	const onClickItemLogout = async () => {
 		if (window.confirm('Вы действительно хотите выйти?')) {
+			await dispatch(setIsAdmin(false))
 			await dispatch(setUserImgUrl(''))
 			await dispatch(logout())
 			resetUser()
@@ -94,10 +95,10 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 			)}
 			{isVisibleMenu && (
 				<div className='popup-menu'>
-					<p className='popup-menu-info-user'>
+					{/* <p className='popup-menu-info-user'>
 						Вы вошли как <br />
 						<b>{isAuth?.decoded?.email || isAuth?.email}</b>
-					</p>
+					</p> */}
 					<ul className='popup-menu-list'>
 						<li className='popup-menu-item' onClick={onClickItemSettings}>
 							Настройки

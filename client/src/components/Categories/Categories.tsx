@@ -3,8 +3,9 @@ import { useSelector } from 'react-redux'
 import { setCategoryId, setNameCategory } from '../../redux/slices/filterSlice'
 import { RootState, useAppDispatch } from '../../redux/store'
 
+export const arrCategories = ['Все', 'Катриджи', 'Системники', 'Мониторы', 'Видеокарты']
+
 export const Categories: React.FC = React.memo(() => {
-	const arrCategories = ['Все', 'Катриджи', 'Системники', 'Мониторы', 'Видеокарты']
 	const value = useSelector((state: RootState) => state.filterSlice.categoryId)
 	const dispatch = useAppDispatch()
 

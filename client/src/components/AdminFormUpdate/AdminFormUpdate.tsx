@@ -1,10 +1,11 @@
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import { DataProduct } from '../../pages/AdminPanel'
-import { TextField } from '@mui/material'
+import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import { updateProduct } from '../../redux/slices/productSlice'
 import customAxios from '../../axios'
 import { useAppDispatch } from '../../redux/store'
+import { arrCategories } from '../Categories/Categories'
 
 interface IAdminFormUpdate {
 	nameButton: string
@@ -20,6 +21,7 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 	setIsVisiblePopupUpdate,
 }) => {
 	const [imgUrlUpdate, setImgUrlUpdate] = React.useState('')
+	const [category, setCategory] = React.useState(productData?.category || '')
 	const inputFileRef = React.useRef<HTMLInputElement>(null)
 	const dispatch = useAppDispatch()
 
@@ -84,7 +86,6 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 		setValue('title', productData?.title)
 		setValue('description', productData?.description)
 		setValue('price', productData?.price)
-		setValue('category', productData?.category)
 		setValue('rating', productData?.rating)
 		setValue('count', productData?.count)
 		setImgUrlUpdate(productData?.imgurl ? productData.imgurl : '')
@@ -117,14 +118,25 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 					{...register('price', { required: 'Укажите цену' })}
 				/>
 				{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
-				<TextField
-					id='outlined-basic'
-					label='Категория'
-					className='form-block__input'
-					variant='outlined'
-					{...register('category', { required: 'Укажите категорию' })}
-				/>
-				{errors.price && <p style={{ color: 'red' }}>{errors.price.message}</p>}
+				<FormControl fullWidth>
+					<InputLabel id='demo-simple-select-label'>Категория</InputLabel>
+					<Select
+						labelId='demo-simple-select-label'
+						id='demo-simple-select'
+						value={category}
+						label='Категория'
+						{...register('category', {
+							required: 'Укажите категорию',
+							onChange: (event) => setCategory(event.target.value),
+						})}
+					>
+						{arrCategories.slice(1).map((item, index) => (
+							<MenuItem key={index + 1} value={index + 1}>
+								{item}
+							</MenuItem>
+						))}
+					</Select>
+				</FormControl>
 				<TextField
 					id='outlined-basic'
 					label='Рейтинг от 1 до 5'

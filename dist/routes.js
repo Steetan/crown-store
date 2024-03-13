@@ -6,6 +6,7 @@ import checkAuth from './utils/checkAuth.js';
 import multer from 'multer';
 import checkAdmin from './utils/checkAdmin.js';
 import { deleteAllCartById, deleteCart, deleteCartById, getProductCart, getProductCartById, pushCart, updateCart, } from './controllers/CartController.js';
+import { postEmail } from './controllers/EmailController.js';
 const router = Router();
 const storage = multer.diskStorage({
     destination: (_, __, cb) => {
@@ -63,4 +64,5 @@ router.get('/auth/meinfo', checkAuth, getMeInfo);
 router.post('/auth/reg', registerValidator, createUser);
 router.post('/auth/login', registerValidator, loginUser);
 router.delete('/auth/delete', checkAuth, deleteMe);
+router.post('/email', checkAuth, postEmail);
 export default router;
