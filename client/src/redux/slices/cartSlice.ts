@@ -44,9 +44,6 @@ const cartSlice = createSlice({
 		setTotalPrice: (state, action: PayloadAction<number>) => {
 			state.totalPrice = action.payload
 		},
-		setCartItems: (state, action: PayloadAction<any>) => {
-			state.cartItems = action.payload
-		},
 		setTotalCount: (state, action: PayloadAction<any>) => {
 			state.totalCount = action.payload
 		},
@@ -70,6 +67,6 @@ const cartSlice = createSlice({
 
 export const selectCart = (state: RootState) => state.cartSlice
 
-export const { setTotalPrice, setCartItems, setTotalCount, setCountProduct } = cartSlice.actions
+export const { setTotalPrice, setTotalCount, setCountProduct } = cartSlice.actions
 
 export default cartSlice.reducer

@@ -11,6 +11,7 @@ interface IPopupMenu {
 
 const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 	const [isVisibleMenu, setIsVisibleMenu] = React.useState(false)
+	const [nickname, setNickname] = React.useState('')
 
 	const dispatch = useAppDispatch()
 	const menuRef = React.useRef<HTMLDivElement>(null)
@@ -25,6 +26,7 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 				const fetchUserImg = async () => {
 					const { data } = await customAxios.get('/auth/meinfo')
 					dispatch(setUserImgUrl(data.user_imgurl))
+					setNickname(data.email)
 				}
 				fetchUserImg()
 			}
@@ -47,12 +49,6 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 		}
 	}, [isAuth])
 
-	console.log('userImgUrl', userImgUrl)
-
-	const onClickLogout = () => {
-		setIsVisibleMenu(!isVisibleMenu)
-	}
-
 	const resetUser = () => {
 		window.localStorage.removeItem('token')
 		navigate('/')
@@ -68,20 +64,15 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 		}
 	}
 
-	const onClickItemSettings = async () => {
-		navigate('/settings')
-	}
-
 	return (
 		<>
 			{isAuth && (
-				<div className='btn-avatar' onClick={onClickLogout} ref={menuRef}>
+				<div className='btn-avatar' onClick={() => setIsVisibleMenu(!isVisibleMenu)} ref={menuRef}>
 					{userImgUrl && (
 						<img
 							className='btn-avatar-img'
 							src={`http://localhost:8080/uploads/userIcons/${userImgUrl}`}
 							alt='ava'
-							// onError={require('../../assets/avatar-icon.png')}
 						/>
 					)}
 					{!userImgUrl && (
@@ -95,12 +86,14 @@ const PopupMenu: React.FC<IPopupMenu> = ({ isAuth }) => {
 			)}
 			{isVisibleMenu && (
 				<div className='popup-menu'>
-					{/* <p className='popup-menu-info-user'>
-						Вы вошли как <br />
-						<b>{isAuth?.decoded?.email || isAuth?.email}</b>
-					</p> */}
+					{isAuth && (
+						<p className='popup-menu-info-user'>
+							Вы вошли как <br />
+							<b>{nickname}</b>
+						</p>
+					)}
 					<ul className='popup-menu-list'>
-						<li className='popup-menu-item' onClick={onClickItemSettings}>
+						<li className='popup-menu-item' onClick={() => navigate('/settings')}>
 							Настройки
 						</li>
 						<li className='popup-menu-item' onClick={onClickItemLogout}>

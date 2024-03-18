@@ -5,6 +5,7 @@ import NotFound from './NotFound'
 import customAxios from '../axios'
 import AdminForm from '../components/AdminForm/AdminForm'
 import AdminFormUpdate from '../components/AdminFormUpdate/AdminFormUpdate'
+import { Link } from 'react-router-dom'
 
 export interface DataProduct {
 	id?: string
@@ -105,76 +106,83 @@ const AdminPanel: React.FC = () => {
 	}
 
 	return (
-		<div className='admin-block'>
-			<div className='form-block form-block--admin'>
-				<h3 className='form-block__title'>Добавить</h3>
-				<AdminForm nameButton='Добавить продукт' />
-			</div>
-			<div className='admin__list-main-block'>
-				<div className='admin__list-header'>
-					<h3 className='admin__list-title'>Продукты</h3>
-					<h4 className='admin__list-deleteAll' onClick={deleteProducts}>
-						Удалить все
-					</h4>
+		<div>
+			<div className='admin-block'>
+				<div className='form-block form-block--admin'>
+					<h3 className='form-block__title'>Добавить</h3>
+					<AdminForm nameButton='Добавить продукт' />
 				</div>
-				<div className='admin__list-block'>
-					<div className='admin__list-item'>
-						<div className='admin__list-cell admin__list-cell--title'>id</div>
-						<div className='admin__list-cell admin__list-cell--title'>title</div>
-						<div className='admin__list-cell admin__list-cell--title'>description</div>
-						<div className='admin__list-cell admin__list-cell--title'>price</div>
-						<div className='admin__list-cell admin__list-cell--title'>category</div>
-						<div className='admin__list-cell admin__list-cell--title'>imgurl</div>
-						<div className='admin__list-cell admin__list-cell--title'>rating</div>
-						<div className='admin__list-cell admin__list-cell--title'>count</div>
+				<div className='admin__list-main-block'>
+					<div className='admin__list-header'>
+						<h3 className='admin__list-title'>Продукты</h3>
+						<h4 className='admin__list-deleteAll' onClick={deleteProducts}>
+							Удалить все
+						</h4>
 					</div>
-					{!hasError &&
-						fetchData.map((item: DataProduct) => (
-							<div key={item.id}>
-								<div className='admin__list-item'>
-									<div className='admin__list-cell'>{item.id}</div>
-									<div className='admin__list-cell'>{item.title}</div>
-									<div className='admin__list-cell'>{item.description}</div>
-									<div className='admin__list-cell'>{item.price}</div>
-									<div className='admin__list-cell'>{item.category}</div>
-									<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'false'}</div>
-									<div className='admin__list-cell'>{item.rating}</div>
-									<div className='admin__list-cell'>{item.count}</div>
-									<div className='admin__list-cell-act'>
-										<img
-											onClick={() => onOpenPopup(item)}
-											className='admin__list-cell-update'
-											src={require('../assets/system-update.png')}
-											alt='update'
-											title='обновить строку'
-										/>
-										<img
-											className='admin__list-cell-delete'
-											onClick={() => deleteItem(item.id ? item.id : '', item.title)}
-											src={require('../assets/delete.png')}
-											title='удалить строку'
-										/>
+					<div className='admin__list-block'>
+						<div className='admin__list-item'>
+							<div className='admin__list-cell admin__list-cell--title'>id</div>
+							<div className='admin__list-cell admin__list-cell--title'>title</div>
+							<div className='admin__list-cell admin__list-cell--title'>description</div>
+							<div className='admin__list-cell admin__list-cell--title'>price</div>
+							<div className='admin__list-cell admin__list-cell--title'>category</div>
+							<div className='admin__list-cell admin__list-cell--title'>imgurl</div>
+							<div className='admin__list-cell admin__list-cell--title'>rating</div>
+							<div className='admin__list-cell admin__list-cell--title'>count</div>
+						</div>
+						{!hasError &&
+							fetchData.map((item: DataProduct) => (
+								<div key={item.id}>
+									<div className='admin__list-item'>
+										<div className='admin__list-cell'>{item.id}</div>
+										<div className='admin__list-cell'>{item.title}</div>
+										<div className='admin__list-cell'>{item.description}</div>
+										<div className='admin__list-cell'>{item.price}</div>
+										<div className='admin__list-cell'>{item.category}</div>
+										<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'false'}</div>
+										<div className='admin__list-cell'>{item.rating}</div>
+										<div className='admin__list-cell'>{item.count}</div>
+										<div className='admin__list-cell-act'>
+											<img
+												onClick={() => onOpenPopup(item)}
+												className='admin__list-cell-update'
+												src={require('../assets/system-update.png')}
+												alt='update'
+												title='обновить строку'
+											/>
+											<img
+												className='admin__list-cell-delete'
+												onClick={() => deleteItem(item.id ? item.id : '', item.title)}
+												src={require('../assets/delete.png')}
+												title='удалить строку'
+											/>
+										</div>
 									</div>
 								</div>
-							</div>
-						))}
-				</div>
-				{isVisiblePopupUpdate && (
-					<div className='popup-update__wrapper'>
-						<div className='popup-update'>
-							<h3 className='form-block__title'>Обновить продукт</h3>
-							<div className='popup-update__close-wrap' onClick={onClosePopup}>
-								<div className='popup-update__close'></div>
-							</div>
-							<AdminFormUpdate
-								nameButton='Обновить'
-								productData={selectedProductData}
-								setFetchData={setFetchData}
-								setIsVisiblePopupUpdate={setIsVisiblePopupUpdate}
-							/>
-						</div>
+							))}
 					</div>
-				)}
+					{isVisiblePopupUpdate && (
+						<div className='popup-update__wrapper'>
+							<div className='popup-update'>
+								<h3 className='form-block__title'>Обновить продукт</h3>
+								<div className='popup-update__close-wrap' onClick={onClosePopup}>
+									<div className='popup-update__close'></div>
+								</div>
+								<AdminFormUpdate
+									nameButton='Обновить'
+									productData={selectedProductData}
+									setFetchData={setFetchData}
+									setIsVisiblePopupUpdate={setIsVisiblePopupUpdate}
+								/>
+							</div>
+						</div>
+					)}
+				</div>
+			</div>
+			<div style={{ display: 'flex', justifyContent: 'center', marginTop: 30 }}>
+				<Link to='/' className='button button--black'>
+					<span>Вернуться назад</span>
+				</Link>
 			</div>
 		</div>
 	)

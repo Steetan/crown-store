@@ -20,12 +20,16 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 	} = useForm<DataProduct>()
 
 	const onSubmit = async (values: DataProduct) => {
-		const data = await dispatch(createProduct({ ...values, fileimg: imgUrl }))
-		if (!data.payload) {
-			return alert('Не удалось создать продукт!')
-		}
-		if (data.payload) {
-			window.location.reload()
+		try {
+			const data = await dispatch(createProduct({ ...values, fileimg: imgUrl }))
+			if (!data.payload) {
+				return alert('Не удалось создать продукт!')
+			}
+			if (data.payload) {
+				window.location.reload()
+			}
+		} catch (error) {
+			console.log(error)
 		}
 	}
 

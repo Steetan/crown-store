@@ -4,12 +4,12 @@ import { Search } from '../Search/Search'
 import { useSelector } from 'react-redux'
 import { selectCart } from '../../redux/slices/cartSlice'
 import { setSearchInput } from '../../redux/slices/filterSlice'
-import { fetchAdminMe, selectIsAuth, setIsAdmin } from '../../redux/slices/authSlice'
+import { fetchAdminMe, setIsAdmin } from '../../redux/slices/authSlice'
 import PopupMenu from '../PopupMenu/PopupMenu'
 import { RootState, useAppDispatch } from '../../redux/store'
 
 export const Header: React.FC = () => {
-	const isAuth = useSelector(selectIsAuth)
+	const isAuth = localStorage.getItem('token')
 	const { totalPrice } = useSelector(selectCart)
 	const { totalCount } = useSelector((state: RootState) => state.cartSlice)
 	const { isAdmin } = useSelector((state: RootState) => state.authSlice)

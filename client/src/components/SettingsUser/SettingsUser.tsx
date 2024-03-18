@@ -2,7 +2,7 @@ import React from 'react'
 import customAxios from '../../axios'
 import { RootState, useAppDispatch } from '../../redux/store'
 import { fetchDeleteMe, setUserImgUrl } from '../../redux/slices/authSlice'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
 const SettingsUser = ({}) => {
@@ -178,7 +178,6 @@ const SettingsUser = ({}) => {
 										onChange={(e) => setUserPassword(e.target.value)}
 									/>
 								</div>
-								{/* {!userPassword && <p style={{ color: 'red', marginBottom: 10 }}>Введите пароль</p>} */}
 							</div>
 							<div className='settings__password-hr'></div>
 							<div className='settings__password-input'>
@@ -191,9 +190,6 @@ const SettingsUser = ({}) => {
 										onChange={(e) => setUserPasswordRepeat(e.target.value)}
 									/>
 								</div>
-								{/* {!userPasswordRepeat && (
-									<p style={{ color: 'red', marginBottom: 10 }}>Введите пароль еще раз</p>
-								)} */}
 							</div>
 						</div>
 						{userPassword !== userPasswordRepeat && (
@@ -242,6 +238,9 @@ const SettingsUser = ({}) => {
 			>
 				Удалить аккаунт
 			</button>
+			<Link to='/' className='button button--black' style={{ marginTop: 20 }}>
+				<span>Вернуться назад</span>
+			</Link>
 		</div>
 	)
 }

@@ -3,13 +3,12 @@ import { Link, Navigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { FormData } from './Registration'
 import { useAppDispatch } from '../redux/store'
-import { fetchUserData, selectIsAuth } from '../redux/slices/authSlice'
-import { useSelector } from 'react-redux'
+import { fetchUserData } from '../redux/slices/authSlice'
 import { TextField } from '@mui/material'
 
 const Login = ({}) => {
 	const dispatch = useAppDispatch()
-	const isAuth = useSelector(selectIsAuth)
+	const isAuth = localStorage.getItem('token')
 
 	const {
 		register,
