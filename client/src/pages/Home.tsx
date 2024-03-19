@@ -83,26 +83,6 @@ const Home = () => {
 		}
 	}, [])
 
-	const getProductsCart = () => {
-		let totalPrice = 0
-
-		dispatch(getCart()).then((data) => {
-			let arrCountProduct: { product: string; count: number }[] = []
-			data.payload &&
-				data.payload.results.forEach((item: any) => {
-					totalPrice += item.product_price * item.totalcount
-					arrCountProduct.push({ product: item.product_id, count: item.totalcount })
-				})
-			dispatch(setCountProduct(arrCountProduct))
-			dispatch(setTotalPrice(totalPrice))
-			dispatch(setTotalCount(data.payload?.results.length))
-		})
-	}
-
-	React.useEffect(() => {
-		getProductsCart()
-	}, [nameCategory])
-
 	const getProducts = async () => {
 		const categoryParam: string = `${`categoryid=${categoryId}`}`
 		const sortParam: string = `&sortBy=${sort.sort}`
@@ -159,8 +139,26 @@ const Home = () => {
 	}, [categoryId, sort.sort, typeSort.sort, selectedPage, nameCategory])
 
 	React.useEffect(() => {
+		getProductsCart()
+
 		dispatch(setSelectedPage(1))
 	}, [categoryId])
+
+	const getProductsCart = () => {
+		let totalPrice = 0
+
+		dispatch(getCart()).then((data) => {
+			let arrCountProduct: { product: string; count: number }[] = []
+			data.payload &&
+				data.payload.results.forEach((item: any) => {
+					totalPrice += item.product_price * item.totalcount
+					arrCountProduct.push({ product: item.product_id, count: item.totalcount })
+				})
+			dispatch(setCountProduct(arrCountProduct))
+			dispatch(setTotalPrice(totalPrice))
+			dispatch(setTotalCount(data.payload?.results.length))
+		})
+	}
 
 	const setFilter = () => {
 		dispatch(setIsVisibleFilterPopup(true))

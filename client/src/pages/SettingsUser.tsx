@@ -1,7 +1,7 @@
 import React from 'react'
-import customAxios from '../../axios'
-import { RootState, useAppDispatch } from '../../redux/store'
-import { fetchDeleteMe, setUserImgUrl } from '../../redux/slices/authSlice'
+import customAxios from '../axios'
+import { RootState, useAppDispatch } from '../redux/store'
+import { fetchDeleteMe, setUserImgUrl } from '../redux/slices/authSlice'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 
@@ -10,6 +10,8 @@ const SettingsUser = ({}) => {
 	const [userDataFname, setUserDataFname] = React.useState('')
 	const [userDataOname, setUserDataOname] = React.useState('')
 	const [userDataEmail, setUserDataEmail] = React.useState('')
+
+	const [isAdmin, setIsAdmin] = React.useState(false)
 
 	const inputFileRef = React.useRef<HTMLInputElement>(null)
 
@@ -29,12 +31,13 @@ const SettingsUser = ({}) => {
 			setUserDataFname(data.fname_user)
 			setUserDataOname(data.oname_user)
 			setUserDataEmail(data.email)
+			setIsAdmin(data.access)
 		}
 		fetchMe()
 	}, [])
 
 	const onClickItemDelete = async () => {
-		if (window.confirm('Вы действительно хотите удалить аккаунт?')) {
+		if (window.confirm('Вы действительно хотите удалить аккаунт?') && !isAdmin) {
 			await customAxios.delete('/cart/deleteallbyid')
 			await dispatch(fetchDeleteMe(window.localStorage.getItem('token'))).finally(() => {
 				window.localStorage.removeItem('token')
@@ -105,19 +108,21 @@ const SettingsUser = ({}) => {
 	}
 
 	const deleteImg = async () => {
-		try {
-			await customAxios.delete(`http://localhost:8080/upload/user/delete/${userImgUrl}`)
-			if (inputFileRef.current) {
-				inputFileRef.current.value = ''
-			}
+		if (window.confirm('Вы действительно хотите удалить аккаунт?')) {
+			try {
+				await customAxios.delete(`http://localhost:8080/upload/user/delete/${userImgUrl}`)
+				if (inputFileRef.current) {
+					inputFileRef.current.value = ''
+				}
 
-			await customAxios.patch('/auth/updimg', {
-				img: '',
-			})
-		} catch (error) {
-			console.log(error)
+				await customAxios.patch('/auth/updimg', {
+					img: '',
+				})
+			} catch (error) {
+				console.log(error)
+			}
+			dispatch(setUserImgUrl(''))
 		}
-		dispatch(setUserImgUrl(''))
 	}
 
 	return (
@@ -222,7 +227,7 @@ const SettingsUser = ({}) => {
 
 					{userImgUrl && (
 						<button className='settings__btn-delete' onClick={deleteImg}>
-							Удалить
+							Удалить изображение
 						</button>
 					)}
 					<img

@@ -70,10 +70,10 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 				/>
 				{errors.title && <p style={{ color: 'red' }}>{errors.title.message}</p>}
 				<TextField
-					id='outlined-basic'
-					label='Описание'
-					className='form-block__input'
-					variant='outlined'
+					placeholder='Описание'
+					multiline
+					rows={2}
+					maxRows={4}
 					{...register('description', { required: 'Укажите описание' })}
 				/>
 				{errors.description && <p style={{ color: 'red' }}>{errors.description.message}</p>}

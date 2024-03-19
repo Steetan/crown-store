@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
 	const location = useLocation()
 	const dispatch = useAppDispatch()
 
-	const isLoginPage =
+	const isNotHomePage =
 		location.pathname === '/auth/login' ||
 		location.pathname === '/auth/reg' ||
 		location.pathname === '/settings' ||
@@ -49,22 +49,22 @@ export const Header: React.FC = () => {
 						<p>быстро и удобно</p>
 					</div>
 				</Link>
-				{location.pathname !== '/cart' && !isLoginPage && <Search />}
+				{location.pathname !== '/cart' && location.pathname === '/' && !isNotHomePage && <Search />}
 
 				<div style={{ display: 'flex', gap: 10 }}>
-					{!isAuth && !isLoginPage && (
+					{!isAuth && !isNotHomePage && (
 						<Link to='/auth/login' className='button button--cart'>
 							Войти
 						</Link>
 					)}
 
-					{isAdmin && !isLoginPage && (
+					{isAdmin && !isNotHomePage && (
 						<Link to='/adminpanel' className=''>
 							<img style={{ width: 50 }} src={require('../../assets/adminIcon.png')} alt='admin' />
 						</Link>
 					)}
 
-					{isAuth && !isLoginPage && (
+					{isAuth && !isNotHomePage && (
 						<Link
 							to='/cart'
 							onClick={() => dispatch(setSearchInput(''))}

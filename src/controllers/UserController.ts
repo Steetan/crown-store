@@ -156,7 +156,7 @@ export const getMeInfo = async (req: Request, res: Response) => {
 				res.json({ error: 'Неверный токен' })
 			} else {
 				pool.query(
-					'SELECT name_user, fname_user, oname_user, user_imgurl, email FROM users WHERE id = $1',
+					'SELECT name_user, fname_user, oname_user, user_imgurl, email, access FROM users WHERE id = $1',
 					[decoded.id],
 					(error: Error, results: QueryResult) => {
 						if (error) throw error

@@ -1,12 +1,12 @@
 import React, { ChangeEvent } from 'react'
 import styles from './Search.module.scss'
-import { useDispatch } from 'react-redux'
 import { setSearchInput } from '../../redux/slices/filterSlice'
 import debounce from 'lodash.debounce'
+import { useAppDispatch } from '../../redux/store'
 
 export const Search = () => {
 	const [value, setValue] = React.useState('')
-	const dispatch = useDispatch()
+	const dispatch = useAppDispatch()
 	const inputRef = React.useRef<HTMLInputElement>(null)
 
 	const clearInput = () => {

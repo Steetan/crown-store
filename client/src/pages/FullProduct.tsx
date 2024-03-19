@@ -1,6 +1,6 @@
 import React from 'react'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { getCart, setCountProduct, setTotalCount, setTotalPrice } from '../redux/slices/cartSlice'
 import { useAppDispatch } from '../redux/store'
 
@@ -58,6 +58,10 @@ const FullProduct: React.FC = () => {
 			</div>
 			<h2 className='product-block__title--fullProduct'>{dataProduct.title}</h2>
 			<p className='product-block__desc'>{dataProduct.description}</p>
+
+			<Link to='/' className='button button--black'>
+				<span>Вернуться назад</span>
+			</Link>
 		</div>
 	)
 }
