@@ -60,7 +60,6 @@ export const getProductById = (req, res) => {
     });
 };
 export const updateProduct = (req, res) => {
-    console.log('updateProduct', req.body);
     pool.query('UPDATE product SET title = $1, description = $2, price = $3, category = $4, imgurl = $5, rating = $6, count = $7 WHERE id = $8', [
         req.body.title,
         req.body.description,
@@ -73,7 +72,15 @@ export const updateProduct = (req, res) => {
     ], (error, results) => {
         if (error)
             throw error;
-        res.status(200).json(results.rows);
+        pool.query('UPDATE carts SET product_title = $1, product_price = $2, product_img = $3 WHERE product_id = $4', [req.body.title, req.body.price, req.body.fileimg, req.body.id], (error, results) => {
+            if (error)
+                throw error;
+            pool.query('DELETE FROM carts WHERE product_id NOT IN (SELECT id FROM product WHERE count > 0)', (error, results) => {
+                if (error)
+                    throw error;
+            });
+            res.status(200).json(results.rows);
+        });
     });
 };
 export const createProduct = (req, res) => {
@@ -145,7 +152,11 @@ export const deleteProductById = (req, res) => {
         pool.query('DELETE FROM product WHERE id = $1', [req.query.product], (error, results) => {
             if (error)
                 throw error;
-            res.status(200).json({ message: 'product has been deleted' });
+            pool.query('DELETE FROM carts WHERE product_id = $1', [req.query.product], (error, results) => {
+                if (error)
+                    throw error;
+                res.status(200).json({ message: 'product has been deleted' });
+            });
         });
     }
     catch (error) {
@@ -157,7 +168,11 @@ export const deleteProducts = (req, res) => {
         pool.query('DELETE FROM product', (error, results) => {
             if (error)
                 throw error;
-            res.status(200).json({ message: 'products has been deleted' });
+            pool.query('DELETE FROM carts', (error, results) => {
+                if (error)
+                    throw error;
+                res.status(200).json({ message: 'products has been deleted' });
+            });
         });
     }
     catch (error) {
