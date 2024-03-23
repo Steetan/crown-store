@@ -20,6 +20,12 @@
 		img {
 			max-width: 100%;
 		}
+		&--full {
+			overflow: hidden;
+			border-radius: 10px;
+			min-width: 500px;
+			max-height: none;
+		}
 	}
 
 	&__title {
@@ -32,6 +38,11 @@
 			max-width: 600px;
 			font-size: 24px;
 		}
+	}
+
+	&__block-desc {
+		display: flex;
+		flex-direction: column;
 	}
 
 	&__desc {

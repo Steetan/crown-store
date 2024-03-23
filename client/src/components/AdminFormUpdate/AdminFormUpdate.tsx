@@ -103,10 +103,10 @@ const AdminFormUpdate: React.FC<IAdminFormUpdate> = ({
 				/>
 				{errors.title && <p style={{ color: 'red' }}>{errors.title.message}</p>}
 				<TextField
-					id='outlined-basic'
-					label='Описание'
-					className='form-block__input'
-					variant='outlined'
+					placeholder='Описание'
+					multiline
+					rows={7}
+					maxRows={8}
 					{...register('description', { required: 'Укажите описание' })}
 				/>
 				{errors.description && <p style={{ color: 'red' }}>{errors.description.message}</p>}

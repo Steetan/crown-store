@@ -156,7 +156,7 @@ export const getMeInfo = async (req: Request, res: Response) => {
 				res.json({ error: 'Неверный токен' })
 			} else {
 				pool.query(
-					'SELECT name_user, fname_user, oname_user, user_imgurl, email, access FROM users WHERE id = $1',
+					'SELECT name_user, fname_user, oname_user, user_imgurl, email, phone_number, access FROM users WHERE id = $1',
 					[decoded.id],
 					(error: Error, results: QueryResult) => {
 						if (error) throw error
@@ -213,8 +213,15 @@ export const updateUser = async (req: Request, res: Response) => {
 				res.status(401).json({ error: 'Неверный токен' })
 			} else {
 				pool.query(
-					'UPDATE users SET name_user = $1, fname_user = $2, oname_user = $3, email = $4 WHERE id=$5',
-					[req.body.name, req.body.fname, req.body.oname, req.body.email, decoded.id],
+					'UPDATE users SET name_user = $1, fname_user = $2, oname_user = $3, email = $4, phone_number = $5 WHERE id = $6',
+					[
+						req.body.name,
+						req.body.fname,
+						req.body.oname,
+						req.body.email,
+						req.body.phone,
+						decoded.id,
+					],
 					(error: Error, results: QueryResult) => {
 						if (error) throw error
 						res.status(200).json({ message: 'Данные были обновлены успешно!' })

@@ -115,6 +115,7 @@ const AdminPanel: React.FC = () => {
 				<div className='admin__list-main-block'>
 					<div className='admin__list-header'>
 						<h3 className='admin__list-title'>Продукты</h3>
+						<p className=''>{fetchData.length} шт.</p>
 						<h4 className='admin__list-deleteAll' onClick={deleteProducts}>
 							Удалить все
 						</h4>
@@ -136,7 +137,11 @@ const AdminPanel: React.FC = () => {
 									<div className='admin__list-item'>
 										<div className='admin__list-cell'>{item.id}</div>
 										<div className='admin__list-cell'>{item.title}</div>
-										<div className='admin__list-cell'>{item.description}</div>
+										<div className='admin__list-cell'>
+											{item?.description && item?.description?.length < 20
+												? item?.description
+												: item?.description?.substring(0, 20) + '...'}
+										</div>
 										<div className='admin__list-cell'>{item.price}</div>
 										<div className='admin__list-cell'>{item.category}</div>
 										<div className='admin__list-cell'>{item.imgurl ? item.imgurl : 'false'}</div>

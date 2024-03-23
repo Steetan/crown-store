@@ -10,6 +10,7 @@ const SettingsUser = ({}) => {
 	const [userDataFname, setUserDataFname] = React.useState('')
 	const [userDataOname, setUserDataOname] = React.useState('')
 	const [userDataEmail, setUserDataEmail] = React.useState('')
+	const [userDataPhone, setUserDataPhone] = React.useState('')
 
 	const [isAdmin, setIsAdmin] = React.useState(false)
 
@@ -31,6 +32,7 @@ const SettingsUser = ({}) => {
 			setUserDataFname(data.fname_user)
 			setUserDataOname(data.oname_user)
 			setUserDataEmail(data.email)
+			setUserDataPhone(data.phone_number)
 			setIsAdmin(data.access)
 		}
 		fetchMe()
@@ -55,6 +57,7 @@ const SettingsUser = ({}) => {
 					fname: userDataFname,
 					oname: userDataOname,
 					email: userDataEmail,
+					phone: userDataPhone,
 				})
 
 				alert(data.message)
@@ -163,7 +166,16 @@ const SettingsUser = ({}) => {
 							value={userDataEmail}
 							onChange={(e) => setUserDataEmail(e.target.value)}
 						/>
-						{!userDataOname && <p style={{ color: 'red', marginBottom: 10 }}>Введите email</p>}
+						{!userDataEmail && <p style={{ color: 'red', marginBottom: 10 }}>Введите email</p>}
+						<input
+							className='settings__input'
+							type='text'
+							value={userDataPhone}
+							onChange={(e) => setUserDataPhone(e.target.value)}
+						/>
+						{!userDataPhone && (
+							<p style={{ color: 'red', marginBottom: 10 }}>Введите номер телефона</p>
+						)}
 						<button type='submit' className='button button--footer' onClick={onSubmit}>
 							Обновить
 						</button>

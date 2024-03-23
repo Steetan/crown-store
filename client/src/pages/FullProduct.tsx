@@ -52,16 +52,21 @@ const FullProduct: React.FC = () => {
 	}, [])
 
 	return (
-		<div className='container container--fullProduct'>
-			<div className='product-block__image'>
-				<img src={`http://localhost:8080/uploads/${dataProduct.imgurl}`} alt='Product' />
+		<div>
+			<div className='container container--fullProduct'>
+				<div className='product-block__image product-block__image--full'>
+					<img src={`http://localhost:8080/uploads/${dataProduct.imgurl}`} alt='Product' />
+				</div>
+				<div className='product-block__block-desc'>
+					<h2 className='product-block__title--fullProduct'>{dataProduct.title}</h2>
+					<p className='product-block__desc'>{dataProduct.description}</p>
+				</div>
 			</div>
-			<h2 className='product-block__title--fullProduct'>{dataProduct.title}</h2>
-			<p className='product-block__desc'>{dataProduct.description}</p>
-
-			<Link to='/' className='button button--black'>
-				<span>Вернуться назад</span>
-			</Link>
+			<div className='button--fullproduct'>
+				<Link to='/' className='button button--black'>
+					<span>Вернуться назад</span>
+				</Link>
+			</div>
 		</div>
 	)
 }

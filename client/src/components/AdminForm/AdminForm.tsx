@@ -72,8 +72,8 @@ const AdminForm: React.FC<{ nameButton: string; productData?: DataProduct }> = (
 				<TextField
 					placeholder='Описание'
 					multiline
-					rows={2}
-					maxRows={4}
+					rows={7}
+					maxRows={8}
 					{...register('description', { required: 'Укажите описание' })}
 				/>
 				{errors.description && <p style={{ color: 'red' }}>{errors.description.message}</p>}

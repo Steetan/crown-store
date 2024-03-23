@@ -170,21 +170,23 @@ const Home = () => {
 			<div className='content__top'>
 				<Categories />
 				<div className='content-settings'>
-					<Sort value={sort} getProductsCart={getProductsCart} />
-					<div className='filter-button-wrapper'>
-						<img
-							className='filter-button'
-							src={require('../assets/filter.jpg')}
-							alt=''
-							onClick={() => setFilter()}
-						/>
-						{(Number(fromRangeFilter) ||
-							Number(toRangeFilter) ||
-							selectedRatingFilter !== null) && <div className='filter-button-notif'></div>}
+					<h2 className='content__title'>{nameCategory}</h2>
+					<div className='content-settings__right-block'>
+						<Sort value={sort} getProductsCart={getProductsCart} />
+						<div className='filter-button-wrapper'>
+							<img
+								className='filter-button'
+								src={require('../assets/filter.jpg')}
+								alt=''
+								onClick={() => setFilter()}
+							/>
+							{(Number(fromRangeFilter) ||
+								Number(toRangeFilter) ||
+								selectedRatingFilter !== null) && <div className='filter-button-notif'></div>}
+						</div>
 					</div>
 				</div>
 			</div>
-			<h2 className='content__title'>{nameCategory}</h2>
 			{searchInput && !items.length && (
 				<div className='content__err'>
 					<h2>Ничего не удалось найти 😓</h2>
